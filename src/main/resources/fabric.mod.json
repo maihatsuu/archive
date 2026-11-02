@@ -3,13 +3,12 @@
 	"id": "archive",
 	"version": "${version}",
 	"name": "Archive",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Enchanting & progression overhaul: tomes and a library enchanting table, a flat XP curve, sturdier gear, faster mining, and a simpler anvil and grindstone.",
 	"authors": [
-		"Me!"
+		"maihatsuu"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/maihatsuu/archive"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/archive/icon.png",
