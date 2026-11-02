@@ -10,7 +10,9 @@
 		"gear.TiersMixin",
 		"anvil.AnvilBlockMixin",
 		"anvil.AnvilMenuMixin",
-		"grindstone.GrindstoneMenuMixin"
+		"grindstone.GrindstoneMenuMixin",
+		"loot.AbstractVillagerMixin",
+		"loot.LootTableMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

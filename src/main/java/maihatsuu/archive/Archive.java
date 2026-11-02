@@ -2,6 +2,8 @@ package maihatsuu.archive;
 
 import maihatsuu.archive.registry.ModComponents;
 import maihatsuu.archive.registry.ModItems;
+import maihatsuu.archive.registry.ModLootFunctions;
+import maihatsuu.archive.tome.StructureTomes;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +20,8 @@ public class Archive implements ModInitializer {
 		ArchiveConfig.get();
 		ModComponents.init();
 		ModItems.init();
+		ModLootFunctions.init();
+		StructureTomes.register();
 		GearComponents.register();
 	}
 
