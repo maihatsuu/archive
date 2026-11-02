@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Hardness for #archive:deepslate_hardness and #archive:obsidian_hardness. Blast resistance is untouched. */
+/** Hardness for #archive:deepslate_hardness, #archive:deepslate_ore_hardness and #archive:obsidian_hardness. Blast resistance is untouched. */
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class BlockStateBaseMixin {
 	@Inject(method = "getDestroySpeed", at = @At("HEAD"), cancellable = true)
@@ -22,6 +22,8 @@ public abstract class BlockStateBaseMixin {
 		BlockBehaviour.BlockStateBase self = (BlockBehaviour.BlockStateBase) (Object) this;
 		if (self.is(ModTags.DEEPSLATE_HARDNESS)) {
 			cir.setReturnValue(config.deepslateHardness);
+		} else if (self.is(ModTags.DEEPSLATE_ORE_HARDNESS)) {
+			cir.setReturnValue(config.deepslateOreHardness);
 		} else if (self.is(ModTags.OBSIDIAN_HARDNESS)) {
 			cir.setReturnValue(config.obsidianHardness);
 		}

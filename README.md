@@ -15,7 +15,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 - **Gear.**
   - Netherite gear, the trident and the mace are unbreakable.
   - Diamond mining speed is 12 and netherite is 19.
-  - Deepslate blocks have hardness 2.0.
+  - Deepslate blocks have hardness 2.0, and deepslate ores 3.5.
   - Obsidian, crying obsidian, respawn anchors and ender chests have hardness 20.0.
 - **Anvil** only repairs (with the base material) and renames, always for free, and never chips.
 - **Grindstone** only disenchants a single item and refunds part of the table cost.
@@ -31,7 +31,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 | `tableRadius` | `6` | Bookshelf scan radius around the table |
 | `grindstoneRefundFraction` | `0.5` | Share of the table cost refunded by the grindstone |
 | `diamondSpeed` / `netheriteSpeed` | `12` / `19` | Tool mining speed (restart needed) |
-| `deepslateHardness` / `obsidianHardness` | `2.0` / `20.0` | Block hardness |
+| `deepslateHardness` / `deepslateOreHardness` / `obsidianHardness` | `2.0` / `3.5` / `20.0` | Block hardness |
 | `durabilityOverrides` | `{}` | Item id → max durability, e.g. `{"minecraft:iron_pickaxe": 500}` (restart needed) |
 
 Client and server should use the same XP, mining and hardness values, or the client will predict them wrong.
@@ -55,7 +55,7 @@ The enchantment and tag changes are data, not code. They're always on, and a dat
 
 The `archive:set_tome` loot function (`{"function": "archive:set_tome", "enchantment": "minecraft:sharpness"}`) can also be used in your own loot tables. It refuses unobtainable enchants and curses.
 
-**Block tags:** `#archive:deepslate_hardness` and `#archive:obsidian_hardness` choose which blocks get the new hardness values.
+**Block tags:** `#archive:deepslate_hardness`, `#archive:deepslate_ore_hardness` and `#archive:obsidian_hardness` choose which blocks get the new hardness values.
 
 ## Development
 

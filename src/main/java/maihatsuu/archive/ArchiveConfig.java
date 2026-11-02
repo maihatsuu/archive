@@ -48,6 +48,7 @@ public final class ArchiveConfig {
 	public float diamondSpeed = 12.0F;
 	public float netheriteSpeed = 19.0F;
 	public float deepslateHardness = 2.0F;
+	public float deepslateOreHardness = 3.5F;
 	public float obsidianHardness = 20.0F;
 
 	/** Item id → max durability. Applied at startup; needs a restart to change. */

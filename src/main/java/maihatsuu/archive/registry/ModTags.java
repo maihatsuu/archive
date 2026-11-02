@@ -11,6 +11,7 @@ public final class ModTags {
 	public static final TagKey<Enchantment> UNOBTAINABLE = TagKey.create(Registries.ENCHANTMENT, Archive.id("unobtainable"));
 
 	public static final TagKey<Block> DEEPSLATE_HARDNESS = TagKey.create(Registries.BLOCK, Archive.id("deepslate_hardness"));
+	public static final TagKey<Block> DEEPSLATE_ORE_HARDNESS = TagKey.create(Registries.BLOCK, Archive.id("deepslate_ore_hardness"));
 	public static final TagKey<Block> OBSIDIAN_HARDNESS = TagKey.create(Registries.BLOCK, Archive.id("obsidian_hardness"));
 
 	private ModTags() {
