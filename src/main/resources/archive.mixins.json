@@ -7,7 +7,10 @@
 		"xp.ThrownExperienceBottleMixin",
 		"xp.ServerPlayerXpMixin",
 		"gear.BlockStateBaseMixin",
-		"gear.TiersMixin"
+		"gear.TiersMixin",
+		"anvil.AnvilBlockMixin",
+		"anvil.AnvilMenuMixin",
+		"grindstone.GrindstoneMenuMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
