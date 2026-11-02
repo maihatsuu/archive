@@ -33,13 +33,17 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void anvilRepairsWithMaterialForFree(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
-		// Iron pickaxe: 250 durability, each ingot repairs 62. Two ingots on 200 damage -> 76.
-		AnvilMenu menu = anvil(player, damaged(new ItemStack(Items.IRON_PICKAXE), 200), new ItemStack(Items.IRON_INGOT, 2));
+		AnvilMenu menu = anvil(player, damaged(new ItemStack(Items.IRON_CHESTPLATE), 200), new ItemStack(Items.IRON_INGOT, 3));
 		ItemStack result = menu.getSlot(2).getItem();
-		helper.assertTrue(result.is(Items.IRON_PICKAXE), "iron pickaxe + iron ingots should repair");
-		helper.assertTrue(result.getDamageValue() == 200 - 62 * 2, "two ingots should repair 124, damage now " + result.getDamageValue());
+		helper.assertTrue(result.is(Items.IRON_CHESTPLATE), "iron chestplate + iron ingot should repair");
+		helper.assertTrue(result.getDamageValue() == 0, "one ingot should fully repair, damage now " + result.getDamageValue());
 		helper.assertTrue(menu.getCost() == 0, "repair should cost 0 levels, got " + menu.getCost());
 		helper.assertTrue(menu.getSlot(2).mayPickup(player), "free result should be pickable");
+		menu.getSlot(2).onTake(player, result);
+		helper.assertTrue(menu.getSlot(1).getItem().getCount() == 2, "repair should use exactly 1 ingot, "
+				+ menu.getSlot(1).getItem().getCount() + " left");
+		helper.assertTrue(anvil(player, new ItemStack(Items.IRON_CHESTPLATE), new ItemStack(Items.IRON_INGOT))
+				.getSlot(2).getItem().isEmpty(), "undamaged item should give no repair result");
 		player.discard();
 		helper.succeed();
 	}

@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * The anvil only repairs with base materials and renames, always for free.
+ * The anvil only repairs (one unit of the base material restores full durability) and renames, always for free.
  * No combining items, no applying books or tomes, no prior-work penalty.
  */
 @Mixin(AnvilMenu.class)
@@ -45,7 +45,6 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 		}
 		ci.cancel();
 		this.cost.set(0);
-		this.repairItemCountCost = 0;
 		this.resultSlots.setItem(0, archive$computeResult());
 		this.broadcastChanges();
 	}
@@ -54,8 +53,11 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 		ItemStack left = this.inputSlots.getItem(0);
 		ItemStack right = this.inputSlots.getItem(1);
 		if (left.isEmpty()) {
+			// Don't reset repairItemCountCost here: vanilla onTake clears the left slot (re-running
+			// createResult) before it reads the count to consume the material.
 			return ItemStack.EMPTY;
 		}
+		this.repairItemCountCost = 0;
 		ItemStack result = left.copy();
 		boolean changed = false;
 
@@ -64,17 +66,12 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 			if (!result.isDamageableItem() || !left.getItem().isValidRepairItem(left, right)) {
 				return ItemStack.EMPTY;
 			}
-			int step = Math.min(result.getDamageValue(), result.getMaxDamage() / 4);
-			if (step <= 0) {
+			if (result.getDamageValue() <= 0) {
 				return ItemStack.EMPTY;
 			}
-			int used = 0;
-			while (step > 0 && used < right.getCount()) {
-				result.setDamageValue(result.getDamageValue() - step);
-				used++;
-				step = Math.min(result.getDamageValue(), result.getMaxDamage() / 4);
-			}
-			this.repairItemCountCost = used;
+			// A single unit of the base material fully repairs the item.
+			result.setDamageValue(0);
+			this.repairItemCountCost = 1;
 			changed = true;
 		}
 
