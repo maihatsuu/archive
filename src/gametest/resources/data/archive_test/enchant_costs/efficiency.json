@@ -1,0 +1,7 @@
+{
+	"enchantment": "minecraft:efficiency",
+	"levels": [
+		{ "xp": 1, "lapis": 1 },
+		{ "xp": 2, "lapis": 1 }
+	]
+}

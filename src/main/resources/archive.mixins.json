@@ -12,7 +12,8 @@
 		"anvil.AnvilMenuMixin",
 		"grindstone.GrindstoneMenuMixin",
 		"loot.AbstractVillagerMixin",
-		"loot.LootTableMixin"
+		"loot.LootTableMixin",
+		"table.EnchantingTableBlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

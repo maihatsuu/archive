@@ -3,7 +3,12 @@ package maihatsuu.archive;
 import maihatsuu.archive.registry.ModComponents;
 import maihatsuu.archive.registry.ModItems;
 import maihatsuu.archive.registry.ModLootFunctions;
+import maihatsuu.archive.registry.ModMenus;
+import maihatsuu.archive.registry.ModNetworking;
+import maihatsuu.archive.table.EnchantCosts;
 import maihatsuu.archive.tome.StructureTomes;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.server.packs.PackType;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +27,9 @@ public class Archive implements ModInitializer {
 		ModItems.init();
 		ModLootFunctions.init();
 		StructureTomes.register();
+		ModMenus.init();
+		ModNetworking.init();
+		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new EnchantCosts.ReloadListener());
 		GearComponents.register();
 	}
 

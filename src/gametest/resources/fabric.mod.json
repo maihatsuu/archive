@@ -11,7 +11,8 @@
 			"maihatsuu.archive.test.GearTests",
 			"maihatsuu.archive.test.AnvilGrindstoneTests",
 			"maihatsuu.archive.test.TomeTests",
-			"maihatsuu.archive.test.BookSourceTests"
+			"maihatsuu.archive.test.BookSourceTests",
+			"maihatsuu.archive.test.LibraryTableTests"
 		]
 	},
 	"depends": {

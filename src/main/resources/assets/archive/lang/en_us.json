@@ -49,5 +49,13 @@
 	"enchantment.minecraft.wind_burst.desc": "A mace smash launches you back into the air.",
 	"enchantment.minecraft.mending.desc": "XP repairs the item. No longer obtainable.",
 	"enchantment.minecraft.vanishing_curse.desc": "The item disappears when you die.",
-	"enchantment.archive.resilience.desc": "Reduces damage from fire, explosions and projectiles, shortens burning, and reduces knockback. Chestplates only."
+	"enchantment.archive.resilience.desc": "Reduces damage from fire, explosions and projectiles, shortens burning, and reduces knockback. Chestplates only.",
+	"archive.table.max": "Max",
+	"archive.table.place_item": "Place an item to enchant",
+	"archive.table.no_tomes": "No tomes shelved nearby",
+	"archive.table.nothing_fits": "No shelved tome fits this item",
+	"archive.table.tooltip.cost": "Cost: %s levels, %s lapis",
+	"archive.table.tooltip.too_expensive": "Not enough levels or lapis",
+	"archive.table.tooltip.incompatible": "Incompatible with %s",
+	"archive.table.tooltip.maxed": "Already at max level"
 }
