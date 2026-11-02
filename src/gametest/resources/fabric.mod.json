@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "archive-gametest",
+	"version": "1.0.0",
+	"name": "Archive Game Tests",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-gametest": [
+			"maihatsuu.archive.test.DataTests"
+		]
+	},
+	"depends": {
+		"archive": "*"
+	}
+}

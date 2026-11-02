@@ -1,0 +1,117 @@
+{
+  "anvil_cost": 4,
+  "description": {
+    "translate": "enchantment.archive.resilience"
+  },
+  "effects": {
+    "minecraft:attributes": [
+      {
+        "amount": {
+          "type": "minecraft:linear",
+          "base": -0.15,
+          "per_level_above_first": -0.15
+        },
+        "attribute": "minecraft:generic.burning_time",
+        "id": "archive:enchantment.resilience.burning_time",
+        "operation": "add_multiplied_base"
+      },
+      {
+        "amount": {
+          "type": "minecraft:linear",
+          "base": 0.15,
+          "per_level_above_first": 0.15
+        },
+        "attribute": "minecraft:generic.explosion_knockback_resistance",
+        "id": "archive:enchantment.resilience.explosion_knockback",
+        "operation": "add_value"
+      },
+      {
+        "amount": {
+          "type": "minecraft:linear",
+          "base": 0.05,
+          "per_level_above_first": 0.05
+        },
+        "attribute": "minecraft:generic.knockback_resistance",
+        "id": "archive:enchantment.resilience.knockback",
+        "operation": "add_value"
+      }
+    ],
+    "minecraft:damage_protection": [
+      {
+        "effect": {
+          "type": "minecraft:add",
+          "value": {
+            "type": "minecraft:linear",
+            "base": 2.0,
+            "per_level_above_first": 2.0
+          }
+        },
+        "requirements": {
+          "condition": "minecraft:any_of",
+          "terms": [
+            {
+              "condition": "minecraft:damage_source_properties",
+              "predicate": {
+                "tags": [
+                  {
+                    "expected": true,
+                    "id": "minecraft:is_fire"
+                  },
+                  {
+                    "expected": false,
+                    "id": "minecraft:bypasses_invulnerability"
+                  }
+                ]
+              }
+            },
+            {
+              "condition": "minecraft:damage_source_properties",
+              "predicate": {
+                "tags": [
+                  {
+                    "expected": true,
+                    "id": "minecraft:is_explosion"
+                  },
+                  {
+                    "expected": false,
+                    "id": "minecraft:bypasses_invulnerability"
+                  }
+                ]
+              }
+            },
+            {
+              "condition": "minecraft:damage_source_properties",
+              "predicate": {
+                "tags": [
+                  {
+                    "expected": true,
+                    "id": "minecraft:is_projectile"
+                  },
+                  {
+                    "expected": false,
+                    "id": "minecraft:bypasses_invulnerability"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "max_cost": {
+    "base": 18,
+    "per_level_above_first": 8
+  },
+  "min_cost": {
+    "base": 10,
+    "per_level_above_first": 8
+  },
+  "max_level": 3,
+  "primary_items": "#minecraft:enchantable/chest_armor",
+  "slots": [
+    "chest"
+  ],
+  "supported_items": "#minecraft:enchantable/chest_armor",
+  "weight": 2
+}
