@@ -5,7 +5,9 @@
 	"mixins": [
 		"xp.PlayerXpMixin",
 		"xp.ThrownExperienceBottleMixin",
-		"xp.ServerPlayerXpMixin"
+		"xp.ServerPlayerXpMixin",
+		"gear.BlockStateBaseMixin",
+		"gear.TiersMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

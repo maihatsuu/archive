@@ -7,7 +7,8 @@
 	"entrypoints": {
 		"fabric-gametest": [
 			"maihatsuu.archive.test.DataTests",
-			"maihatsuu.archive.test.XpTests"
+			"maihatsuu.archive.test.XpTests",
+			"maihatsuu.archive.test.GearTests"
 		]
 	},
 	"depends": {

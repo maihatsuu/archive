@@ -14,6 +14,7 @@ public class Archive implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ArchiveConfig.get();
+		GearComponents.register();
 	}
 
 	public static ResourceLocation id(String path) {
