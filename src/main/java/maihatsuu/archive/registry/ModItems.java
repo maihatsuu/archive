@@ -1,6 +1,7 @@
 package maihatsuu.archive.registry;
 
 import maihatsuu.archive.Archive;
+import maihatsuu.archive.ArchiveConfig;
 import maihatsuu.archive.tome.TomeItem;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -39,11 +40,17 @@ public final class ModItems {
 		return !enchant.is(ModTags.UNOBTAINABLE) && !enchant.is(EnchantmentTags.CURSE);
 	}
 
+	private static boolean hiddenInCreative(ItemStack stack) {
+		return stack.is(Items.ENCHANTED_BOOK)
+				|| (ArchiveConfig.get().anvil && (stack.is(Items.CHIPPED_ANVIL) || stack.is(Items.DAMAGED_ANVIL)));
+	}
+
 	public static void init() {
-		// Enchanted books are replaced by tomes; hide them everywhere in creative.
+		// Hidden everywhere in creative: enchanted books (replaced by tomes) and chipped/damaged
+		// anvils (anvils never degrade while the anvil rework is on).
 		ItemGroupEvents.MODIFY_ENTRIES_ALL.register((group, entries) -> {
-			entries.getDisplayStacks().removeIf(stack -> stack.is(Items.ENCHANTED_BOOK));
-			entries.getSearchTabStacks().removeIf(stack -> stack.is(Items.ENCHANTED_BOOK));
+			entries.getDisplayStacks().removeIf(ModItems::hiddenInCreative);
+			entries.getSearchTabStacks().removeIf(ModItems::hiddenInCreative);
 		});
 	}
 
