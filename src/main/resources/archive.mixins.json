@@ -3,6 +3,9 @@
 	"package": "maihatsuu.archive.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"xp.PlayerXpMixin",
+		"xp.ThrownExperienceBottleMixin",
+		"xp.ServerPlayerXpMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
