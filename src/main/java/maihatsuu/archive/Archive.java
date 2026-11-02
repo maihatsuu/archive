@@ -1,5 +1,7 @@
 package maihatsuu.archive;
 
+import maihatsuu.archive.registry.ModComponents;
+import maihatsuu.archive.registry.ModItems;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.resources.ResourceLocation;
@@ -14,6 +16,8 @@ public class Archive implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ArchiveConfig.get();
+		ModComponents.init();
+		ModItems.init();
 		GearComponents.register();
 	}
 
