@@ -2,19 +2,26 @@ package maihatsuu.archive.test;
 
 import maihatsuu.archive.registry.ModComponents;
 import maihatsuu.archive.registry.ModItems;
+import maihatsuu.archive.tome.LecternTomeMenu;
 import maihatsuu.archive.tome.TomeItem;
 import net.minecraft.ChatFormatting;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LecternBlock;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
 
 import java.util.List;
 
@@ -37,6 +44,27 @@ public class TomeTests implements FabricGameTest {
 				&& contents.getKey().equals("item.archive.tome"), "curse tome name should be just 'Tome'");
 		helper.assertTrue(TomeItem.enchantLine(DataTests.enchant(helper, "minecraft", "binding_curse")).getStyle().getColor()
 				.equals(TextColor.fromLegacyFormat(ChatFormatting.RED)), "curse line should be red");
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void tomeGoesOnALecternAndComesBack(GameTestHelper helper) {
+		BlockPos pos = new BlockPos(1, 1, 1);
+		helper.setBlock(pos, Blocks.LECTERN);
+		ItemStack tome = TomeItem.of(DataTests.enchant(helper, "minecraft", "sharpness"));
+		helper.assertTrue(tome.is(ItemTags.LECTERN_BOOKS), "tomes should be lectern books");
+		Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+		BlockPos absolute = helper.absolutePos(pos);
+		helper.assertTrue(LecternBlock.tryPlaceBook(player, helper.getLevel(), absolute, helper.getBlockState(pos), tome),
+				"tome should go on the lectern");
+		LecternBlockEntity lectern = (LecternBlockEntity) helper.getBlockEntity(pos);
+		helper.assertTrue(helper.getBlockState(pos).getValue(LecternBlock.HAS_BOOK) && LecternTomeMenu.holdsTome(lectern),
+				"lectern should hold the tome");
+
+		LecternTomeMenu menu = LecternTomeMenu.forTest(lectern);
+		helper.assertTrue(menu.clickMenuButton(player, LecternTomeMenu.TAKE_BOOK), "take book should work");
+		helper.assertTrue(!helper.getBlockState(pos).getValue(LecternBlock.HAS_BOOK), "lectern should be empty");
+		helper.assertTrue(player.getInventory().contains(stack -> stack.is(ModItems.TOME)), "player should get the tome back");
 		helper.succeed();
 	}
 

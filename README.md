@@ -2,7 +2,7 @@
 
 An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the client and the server.
 
-- **Tomes replace enchanted books.** A tome holds one enchant, with no level, shown under its name (light blue, or red for curses). Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it. Curse tomes exist too (their enchant line is red) and let you put curses on gear on purpose, e.g. for minigames.
+- **Tomes replace enchanted books.** A tome holds one enchant, with no level, shown under its name (light blue, or red for curses). Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it, or put it on a lectern to read it there. Curse tomes exist too (their enchant line is red) and let you put curses on gear on purpose, e.g. for minigames.
 - **Library enchanting table.** The table lists every shelved enchant that fits the item and sells it one level at a time for a fixed XP + lapis cost, with no randomness. Conflicting enchants are blocked; use the grindstone first.
 - **Bookshelves unlock low levels.** Without a tome, plain bookshelves around the table unlock common enchants up to a per-enchant limit: level I with the table alone, II with 5 bookshelves, III with 10. Higher levels need a tome. Chiseled bookshelves don't count.
 - **Shelf particles.** Enchant particles float to the table from every bookshelf and chiseled bookshelf within range (a 9×9×9 cube by default), so you can see which shelves count.

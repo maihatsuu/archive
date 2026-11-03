@@ -17,7 +17,8 @@
 		"loot.AbstractVillagerMixin",
 		"loot.LootTableMixin",
 		"loot.ReloadableServerRegistriesMixin",
-		"table.EnchantingTableBlockMixin"
+		"table.EnchantingTableBlockMixin",
+		"tome.LecternBlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

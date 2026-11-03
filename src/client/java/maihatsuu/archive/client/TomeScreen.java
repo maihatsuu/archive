@@ -96,6 +96,11 @@ public class TomeScreen extends Screen {
 		this.forwardButton = this.addRenderableWidget(new PageButton(bookLeft + 116, 159, true, button -> turnPage(1), true));
 		this.backButton = this.addRenderableWidget(new PageButton(bookLeft + 43, 159, false, button -> turnPage(-1), true));
 		updateButtons();
+		addBottomButtons();
+	}
+
+	/** The buttons under the book; the lectern screen adds Take Book. */
+	protected void addBottomButtons() {
 		this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose())
 				.bounds(this.width / 2 - 100, 196, 200, 20).build());
 	}
