@@ -52,7 +52,7 @@ public final class ArchiveConfig {
 	public float deepslateOreHardness = 3.5F;
 	public float obsidianHardness = 20.0F;
 
-	/** Item id → max durability. Applied at startup; needs a restart to change. */
+	/** Item id → max durability, on top of Archive's own values (set an item to its vanilla number to undo Archive's). Applied at startup; needs a restart to change. */
 	public Map<String, Integer> durabilityOverrides = new LinkedHashMap<>();
 
 	public static ArchiveConfig get() {

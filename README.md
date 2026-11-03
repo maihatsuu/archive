@@ -16,6 +16,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 - **Flat XP curve.** Every level costs 50 XP, levels cap at 100, a Bottle o' Enchanting gives one level, and you drop 50% of your XP on death.
 - **Gear.**
   - Netherite gear is unbreakable.
+  - New durability for every other tool, weapon and armor piece, in powers of two by tier: wood 32, stone 128, gold 64, chainmail 256, iron 512, diamond 2048 (tools and armor alike; leather 64). Bow, crossbow and shield 512; trident, mace and elytra 2048; fishing rod, shears, flint and steel, brush and the sticks 256.
   - The trident repairs with prismarine shards and the mace with breeze rods (vanilla), one unit for a full repair.
   - Diamond mining speed is 12 and netherite is 19.
   - Deepslate blocks have hardness 2.0, and deepslate ores 3.5.
@@ -36,7 +37,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 | `shelfSteps` | `[0, 5, 10]` | Plain bookshelves needed for each level unlocked without a tome |
 | `diamondSpeed` / `netheriteSpeed` | `12` / `19` | Tool mining speed (restart needed) |
 | `deepslateHardness` / `deepslateOreHardness` / `obsidianHardness` | `2.0` / `3.5` / `20.0` | Block hardness |
-| `durabilityOverrides` | `{}` | Item id → max durability, e.g. `{"minecraft:iron_pickaxe": 500}` (restart needed) |
+| `durabilityOverrides` | `{}` | Item id → max durability, applied on top of Archive's values, e.g. `{"minecraft:iron_pickaxe": 500}` (restart needed). Set an item to its vanilla number to undo Archive's change |
 
 Client and server should use the same XP, mining, hardness and `tableRadius` values, or the client will predict them wrong (the client draws the bookshelf particles from its own `tableRadius`).
 

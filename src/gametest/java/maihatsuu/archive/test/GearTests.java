@@ -25,6 +25,22 @@ public class GearTests implements FabricGameTest {
 	}
 
 	@GameTest(template = EMPTY_STRUCTURE)
+	public void durabilityTable(GameTestHelper helper) {
+		assertDurability(helper, Items.WOODEN_SWORD, 32);
+		assertDurability(helper, Items.IRON_PICKAXE, 512);
+		assertDurability(helper, Items.DIAMOND_CHESTPLATE, 2048);
+		assertDurability(helper, Items.ELYTRA, 2048);
+		assertDurability(helper, Items.TRIDENT, 2048);
+		assertDurability(helper, Items.WARPED_FUNGUS_ON_A_STICK, 256);
+		helper.succeed();
+	}
+
+	private static void assertDurability(GameTestHelper helper, net.minecraft.world.item.Item item, int expected) {
+		int actual = new ItemStack(item).getMaxDamage();
+		helper.assertTrue(actual == expected, item + " durability should be " + expected + ", got " + actual);
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE)
 	public void toolSpeeds(GameTestHelper helper) {
 		float diamond = new ItemStack(Items.DIAMOND_PICKAXE).getDestroySpeed(Blocks.STONE.defaultBlockState());
 		float netherite = new ItemStack(Items.NETHERITE_PICKAXE).getDestroySpeed(Blocks.STONE.defaultBlockState());
