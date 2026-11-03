@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
+import net.minecraft.client.gui.screens.inventory.PageButton;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -23,12 +24,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.lwjgl.glfw.GLFW;
+
 /** Read-only page for a tome: enchant name, max level, description and the gear it applies to. */
 public class TomeScreen extends Screen {
 	private static final int BOOK_WIDTH = 192;
 	private static final int TEXT_LEFT = 36;
 	private static final int TEXT_WIDTH = 114;
-	private static final int TEXT_BOTTOM = 172;
+	// One page: text from y 16 to 172. Several pages: like the vanilla book, the page indicator sits at
+	// y 18, text runs from 32 and stops above the page-turn arrows at 159.
+	private static final int SINGLE_TOP = 16;
+	private static final int SINGLE_BOTTOM = 172;
+	private static final int MULTI_TOP = 32;
+	private static final int MULTI_BOTTOM = 157;
+	private static final int LINE_HEIGHT = 9;
+	private static final int HEADER_HEIGHT = 26;
+	private static final int APPLIES_GAP = 5;
+	private static final int APPLIES_HEADER = 11;
 	private static final int ICON_STEP = 18;
 	private static final long CYCLE_MS = 1000;
 	/** Items in one of these tags share a slot that cycles through them, like the recipe book. */
@@ -39,7 +51,16 @@ public class TomeScreen extends Screen {
 	private final Holder<Enchantment> enchant;
 	/** One slot per kind of gear; a slot with several items cycles through them. */
 	private final List<List<ItemStack>> appliesTo;
-	private List<FormattedCharSequence> descriptionLines = List.of();
+	/** What one page shows: the name header (first page only), description lines, and maybe "Applies to". */
+	private record Page(boolean header, List<FormattedCharSequence> lines, boolean appliesTo) {
+	}
+
+	private List<Page> pages = List.of();
+	private int top = SINGLE_TOP;
+	private int bottom = SINGLE_BOTTOM;
+	private int currentPage;
+	private PageButton forwardButton;
+	private PageButton backButton;
 
 	public TomeScreen(ItemStack tome) {
 		super(tome.getHoverName());
@@ -59,9 +80,79 @@ public class TomeScreen extends Screen {
 
 	@Override
 	protected void init() {
-		this.descriptionLines = this.font.split(description(), TEXT_WIDTH);
+		List<FormattedCharSequence> lines = this.font.split(description(), TEXT_WIDTH);
+		this.top = SINGLE_TOP;
+		this.bottom = SINGLE_BOTTOM;
+		this.pages = paginate(lines);
+		if (this.pages.size() > 1) {
+			// The indicator and arrows take room, so lay out again with the smaller page.
+			this.top = MULTI_TOP;
+			this.bottom = MULTI_BOTTOM;
+			this.pages = paginate(lines);
+		}
+		this.currentPage = Math.min(this.currentPage, this.pages.size() - 1);
+
+		int bookLeft = (this.width - BOOK_WIDTH) / 2;
+		this.forwardButton = this.addRenderableWidget(new PageButton(bookLeft + 116, 159, true, button -> turnPage(1), true));
+		this.backButton = this.addRenderableWidget(new PageButton(bookLeft + 43, 159, false, button -> turnPage(-1), true));
+		updateButtons();
 		this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose())
 				.bounds(this.width / 2 - 100, 196, 200, 20).build());
+	}
+
+	/**
+	 * Splits the description over pages. "Applies to" goes after the last line if its heading and one
+	 * row of icons fit there, otherwise on a page of its own.
+	 */
+	private List<Page> paginate(List<FormattedCharSequence> lines) {
+		List<Page> result = new ArrayList<>();
+		boolean header = true;
+		int y = this.top + HEADER_HEIGHT;
+		List<FormattedCharSequence> pageLines = new ArrayList<>();
+		for (FormattedCharSequence line : lines) {
+			if (y + LINE_HEIGHT > this.bottom) {
+				result.add(new Page(header, List.copyOf(pageLines), false));
+				header = false;
+				pageLines.clear();
+				y = this.top;
+			}
+			pageLines.add(line);
+			y += LINE_HEIGHT;
+		}
+		boolean appliesFits = y + APPLIES_GAP + APPLIES_HEADER + ICON_STEP <= this.bottom;
+		if (appliesFits) {
+			result.add(new Page(header, List.copyOf(pageLines), true));
+		} else {
+			result.add(new Page(header, List.copyOf(pageLines), false));
+			result.add(new Page(false, List.of(), true));
+		}
+		return List.copyOf(result);
+	}
+
+	private void turnPage(int delta) {
+		this.currentPage = Math.max(0, Math.min(this.pages.size() - 1, this.currentPage + delta));
+		updateButtons();
+	}
+
+	private void updateButtons() {
+		this.forwardButton.visible = this.currentPage < this.pages.size() - 1;
+		this.backButton.visible = this.currentPage > 0;
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (super.keyPressed(keyCode, scanCode, modifiers)) {
+			return true;
+		}
+		if (keyCode == GLFW.GLFW_KEY_PAGE_UP && this.backButton.visible) {
+			this.backButton.onPress();
+			return true;
+		}
+		if (keyCode == GLFW.GLFW_KEY_PAGE_DOWN && this.forwardButton.visible) {
+			this.forwardButton.onPress();
+			return true;
+		}
+		return false;
 	}
 
 	private Component description() {
@@ -80,26 +171,38 @@ public class TomeScreen extends Screen {
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
 		super.render(graphics, mouseX, mouseY, partialTick);
-		int left = (this.width - BOOK_WIDTH) / 2 + TEXT_LEFT;
-		int y = 16;
+		int bookLeft = (this.width - BOOK_WIDTH) / 2;
+		int left = bookLeft + TEXT_LEFT;
+		int y = this.top;
+		Page page = this.pages.get(this.currentPage);
 
-		graphics.drawString(this.font, this.enchant.value().description(), left, y, 0x5A2E8C, false);
-		y += 12;
-		Component maxLevel = Component.translatable("enchantment.level." + this.enchant.value().getMaxLevel());
-		graphics.drawString(this.font, Component.translatable("archive.tome.max_level", maxLevel), left, y, 0x555555, false);
-		y += 14;
-
-		for (FormattedCharSequence line : this.descriptionLines) {
-			graphics.drawString(this.font, line, left, y, 0, false);
-			y += 9;
+		if (this.pages.size() > 1) {
+			Component indicator = Component.translatable("book.pageIndicator", this.currentPage + 1, this.pages.size());
+			graphics.drawString(this.font, indicator, bookLeft + BOOK_WIDTH - 44 - this.font.width(indicator), 18, 0, false);
 		}
-		y += 5;
+		if (page.header()) {
+			graphics.drawString(this.font, this.enchant.value().description(), left, y, 0x5A2E8C, false);
+			y += 12;
+			Component maxLevel = Component.translatable("enchantment.level." + this.enchant.value().getMaxLevel());
+			graphics.drawString(this.font, Component.translatable("archive.tome.max_level", maxLevel), left, y, 0x555555, false);
+			y += 14;
+		}
+		for (FormattedCharSequence line : page.lines()) {
+			graphics.drawString(this.font, line, left, y, 0, false);
+			y += LINE_HEIGHT;
+		}
+		if (!page.appliesTo()) {
+			return;
+		}
+		if (!page.lines().isEmpty() || page.header()) {
+			y += APPLIES_GAP;
+		}
 
 		graphics.drawString(this.font, Component.translatable("archive.tome.applies_to"), left, y, 0x555555, false);
-		y += 11;
+		y += APPLIES_HEADER;
 
 		int perRow = TEXT_WIDTH / ICON_STEP;
-		int rows = Math.max(0, (TEXT_BOTTOM - y) / ICON_STEP);
+		int rows = Math.max(0, (this.bottom - y) / ICON_STEP);
 		int capacity = perRow * rows;
 		boolean overflow = this.appliesTo.size() > capacity;
 		int shown = overflow ? Math.max(0, capacity - 1) : this.appliesTo.size();
