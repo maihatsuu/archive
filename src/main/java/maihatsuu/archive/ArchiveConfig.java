@@ -43,9 +43,6 @@ public final class ArchiveConfig {
 	/** Plain bookshelves needed for each level unlocked without a tome: {0, 5, 10} = I with none, II at 5, III at 10. */
 	public int[] shelfSteps = {0, 5, 10};
 
-	// Grindstone
-	public double grindstoneRefundFraction = 0.5;
-
 	// Mining
 	public float diamondSpeed = 12.0F;
 	public float netheriteSpeed = 19.0F;

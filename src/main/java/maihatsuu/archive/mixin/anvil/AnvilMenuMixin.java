@@ -1,6 +1,7 @@
 package maihatsuu.archive.mixin.anvil;
 
 import maihatsuu.archive.ArchiveConfig;
+import maihatsuu.archive.table.EnchantLevels;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringUtil;
@@ -21,8 +22,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * The anvil only repairs (one unit of the base material restores full durability) and renames, always for free.
- * No combining items, no applying books or tomes, no prior-work penalty.
+ * The anvil only repairs (one unit of the base material restores full durability) and renames. Repairs cost
+ * the item's total enchant levels ({@link EnchantLevels#total}), so unenchanted gear repairs for free;
+ * renaming is always free. No combining items, no applying books or tomes, no prior-work penalty.
  */
 @Mixin(AnvilMenu.class)
 public abstract class AnvilMenuMixin extends ItemCombinerMenu {
@@ -44,8 +46,9 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 			return;
 		}
 		ci.cancel();
-		this.cost.set(0);
-		this.resultSlots.setItem(0, archive$computeResult());
+		ItemStack result = archive$computeResult();
+		this.cost.set(!result.isEmpty() && this.repairItemCountCost > 0 ? EnchantLevels.total(this.inputSlots.getItem(0)) : 0);
+		this.resultSlots.setItem(0, result);
 		this.broadcastChanges();
 	}
 
@@ -88,11 +91,11 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 		return changed ? result : ItemStack.EMPTY;
 	}
 
-	/** Vanilla requires cost > 0; with free repairs any result can be taken. */
+	/** Vanilla also requires cost > 0; here free results (renames, unenchanted repairs) can be taken too. */
 	@Inject(method = "mayPickup", at = @At("HEAD"), cancellable = true)
-	private void archive$freePickup(Player player, boolean hasItem, CallbackInfoReturnable<Boolean> cir) {
+	private void archive$mayPickup(Player player, boolean hasItem, CallbackInfoReturnable<Boolean> cir) {
 		if (ArchiveConfig.get().anvil) {
-			cir.setReturnValue(hasItem);
+			cir.setReturnValue(hasItem && (player.hasInfiniteMaterials() || player.experienceLevel >= this.cost.get()));
 		}
 	}
 }

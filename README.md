@@ -20,8 +20,8 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
   - Diamond mining speed is 12 and netherite is 19.
   - Deepslate blocks have hardness 2.0, and deepslate ores 3.5.
   - Obsidian, crying obsidian, respawn anchors and ender chests have hardness 20.0.
-- **Anvil** only repairs and renames, always for free, and never chips (chipped and damaged anvils are hidden from creative). One unit of the base material (e.g. 1 iron ingot) fully repairs an item. Two damaged items can't be combined in the crafting grid either.
-- **Grindstone** only disenchants a single item and refunds part of the table cost. Its screen is titled "Disenchant" and has a single input slot.
+- **Anvil** only repairs and renames, and never chips (chipped and damaged anvils are hidden from creative). One unit of the base material (e.g. 1 iron ingot) fully repairs an item. A repair costs 1 XP level per enchant level on the item (Fire Aspect II = 2 levels; unenchanted gear and curses are free), with no "Too Expensive!" cap. Renaming is free. Two damaged items can't be combined in the crafting grid either.
+- **Grindstone** only disenchants a single item and gives back 1 XP level per enchant level removed (Sharpness V + Sweeping Edge III = 8 levels; curses stay and give nothing). Its screen is titled "Disenchant" and has a single input slot.
 
 ## Config
 
@@ -33,7 +33,6 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 | `xpPerLevel` / `levelCap` / `deathXpFraction` | `50` / `100` / `0.5` | XP curve |
 | `tableRadius` | `4` | How far the table looks for bookshelves: a cube this many blocks out, so 4 = 9×9×9 |
 | `shelfSteps` | `[0, 5, 10]` | Plain bookshelves needed for each level unlocked without a tome |
-| `grindstoneRefundFraction` | `0.5` | Share of the table cost refunded by the grindstone |
 | `diamondSpeed` / `netheriteSpeed` | `12` / `19` | Tool mining speed (restart needed) |
 | `deepslateHardness` / `deepslateOreHardness` / `obsidianHardness` | `2.0` / `3.5` / `20.0` | Block hardness |
 | `durabilityOverrides` | `{}` | Item id → max durability, e.g. `{"minecraft:iron_pickaxe": 500}` (restart needed) |

@@ -1,7 +1,7 @@
 package maihatsuu.archive.mixin.grindstone;
 
 import maihatsuu.archive.ArchiveConfig;
-import maihatsuu.archive.table.GrindstoneRefund;
+import maihatsuu.archive.table.EnchantLevels;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -55,7 +55,7 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
 			return;
 		}
 		ItemStack input = top.isEmpty() ? bottom : top;
-		if (input.isEmpty() || input.getCount() > 1 || !GrindstoneRefund.hasNonCurseEnchants(input)) {
+		if (input.isEmpty() || input.getCount() > 1 || !EnchantLevels.hasNonCurseEnchants(input)) {
 			cir.setReturnValue(ItemStack.EMPTY);
 			return;
 		}
@@ -79,7 +79,7 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
 
 			@Override
 			public void onTake(Player player, ItemStack stack) {
-				int points = GrindstoneRefund.refundPoints(repair.getItem(0)) + GrindstoneRefund.refundPoints(repair.getItem(1));
+				int points = EnchantLevels.refundPoints(repair.getItem(0)) + EnchantLevels.refundPoints(repair.getItem(1));
 				access.execute((level, pos) -> {
 					if (level instanceof ServerLevel serverLevel && points > 0) {
 						ExperienceOrb.award(serverLevel, Vec3.atCenterOf(pos), points);

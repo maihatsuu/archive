@@ -1,6 +1,6 @@
 package maihatsuu.archive.test;
 
-import maihatsuu.archive.table.GrindstoneRefund;
+import maihatsuu.archive.table.EnchantLevels;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.BlockPos;
@@ -17,13 +17,14 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
-/** Phase 4: anvil repairs/renames only and is free; grindstone only disenchants. */
+/** Phase 4: anvil repairs (costing the enchant levels) and renames only; grindstone only disenchants. */
 public class AnvilGrindstoneTests implements FabricGameTest {
 	private static AnvilMenu anvil(ServerPlayer player, ItemStack left, ItemStack right) {
 		AnvilMenu menu = new AnvilMenu(0, player.getInventory(), ContainerLevelAccess.NULL);
@@ -38,19 +39,37 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 	}
 
 	@GameTest(template = EMPTY_STRUCTURE)
-	public void anvilRepairsWithMaterialForFree(GameTestHelper helper) {
+	public void anvilRepairCostsEnchantLevels(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
 		AnvilMenu menu = anvil(player, damaged(new ItemStack(Items.IRON_CHESTPLATE), 200), new ItemStack(Items.IRON_INGOT, 3));
 		ItemStack result = menu.getSlot(2).getItem();
 		helper.assertTrue(result.is(Items.IRON_CHESTPLATE), "iron chestplate + iron ingot should repair");
 		helper.assertTrue(result.getDamageValue() == 0, "one ingot should fully repair, damage now " + result.getDamageValue());
-		helper.assertTrue(menu.getCost() == 0, "repair should cost 0 levels, got " + menu.getCost());
+		helper.assertTrue(menu.getCost() == 0, "unenchanted repair should cost 0 levels, got " + menu.getCost());
 		helper.assertTrue(menu.getSlot(2).mayPickup(player), "free result should be pickable");
 		menu.getSlot(2).onTake(player, result);
 		helper.assertTrue(menu.getSlot(1).getItem().getCount() == 2, "repair should use exactly 1 ingot, "
 				+ menu.getSlot(1).getItem().getCount() + " left");
 		helper.assertTrue(anvil(player, new ItemStack(Items.IRON_CHESTPLATE), new ItemStack(Items.IRON_INGOT))
 				.getSlot(2).getItem().isEmpty(), "undamaged item should give no repair result");
+
+		// Fire Aspect II sword: repair costs 2 levels.
+		player.setGameMode(GameType.SURVIVAL);
+		ItemStack sword = damaged(new ItemStack(Items.IRON_SWORD), 100);
+		EnchantmentHelper.updateEnchantments(sword, m -> m.set(DataTests.enchant(helper, "minecraft", "fire_aspect"), 2));
+		AnvilMenu swordRepair = anvil(player, sword.copy(), new ItemStack(Items.IRON_INGOT));
+		helper.assertTrue(swordRepair.getCost() == 2, "fire aspect II repair should cost 2, got " + swordRepair.getCost());
+		player.experienceLevel = 1;
+		helper.assertTrue(!swordRepair.getSlot(2).mayPickup(player), "1 level isn't enough for a 2-level repair");
+		player.experienceLevel = 5;
+		helper.assertTrue(swordRepair.getSlot(2).mayPickup(player), "5 levels is enough");
+		swordRepair.getSlot(2).onTake(player, swordRepair.getSlot(2).getItem());
+		helper.assertTrue(player.experienceLevel == 3, "repair should take 2 levels, now " + player.experienceLevel);
+
+		// Renaming alone stays free, even on an enchanted item.
+		AnvilMenu rename = anvil(player, sword.copy(), ItemStack.EMPTY);
+		rename.setItemName("Blaze");
+		helper.assertTrue(!rename.getSlot(2).getItem().isEmpty() && rename.getCost() == 0, "renaming should be free");
 		player.discard();
 		helper.succeed();
 	}
@@ -143,9 +162,15 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 		helper.assertTrue(EnchantmentHelper.getItemEnchantmentLevel(DataTests.enchant(helper, "minecraft", "vanishing_curse"), result) == 1,
 				"curse should stay");
 
-		// Sharpness III at default costs is 10 + 10 + 10 = 30 levels; 50% of that at 50 XP/level = 750 points.
-		int refund = GrindstoneRefund.refundPoints(sword);
-		helper.assertTrue(refund == 750, "refund should be 750 points, got " + refund);
+		// One level per non-curse enchant level: sharpness III = 3 levels = 150 points at 50 XP/level.
+		int refund = EnchantLevels.refundPoints(sword);
+		helper.assertTrue(refund == 150, "refund should be 150 points, got " + refund);
+		ItemStack example = new ItemStack(Items.IRON_SWORD);
+		EnchantmentHelper.updateEnchantments(example, m -> {
+			m.set(DataTests.enchant(helper, "minecraft", "sharpness"), 5);
+			m.set(DataTests.enchant(helper, "minecraft", "sweeping_edge"), 3);
+		});
+		helper.assertTrue(EnchantLevels.total(example) == 8, "sharpness V + sweeping edge III should be 8 levels");
 
 		menu.getSlot(1).set(new ItemStack(Items.IRON_SWORD));
 		helper.assertTrue(menu.getSlot(2).getItem().isEmpty(), "two items should give no result");
