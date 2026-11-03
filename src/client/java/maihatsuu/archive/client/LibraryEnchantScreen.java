@@ -118,7 +118,6 @@ public class LibraryEnchantScreen extends AbstractContainerScreen<LibraryEnchant
 				graphics.blitSprite(ROW_DISABLED, listLeft, listTop + row * ROW_HEIGHT, ROW_WIDTH, ROW_HEIGHT);
 				RenderSystem.disableBlend();
 			}
-			graphics.drawWordWrap(this.font, emptyMessage(), listLeft + 4, listTop + 16, ROW_WIDTH - 8, NAME_DISABLED_COLOR);
 			return;
 		}
 
@@ -206,13 +205,6 @@ public class LibraryEnchantScreen extends AbstractContainerScreen<LibraryEnchant
 	private static Component rowName(Option option) {
 		Component level = Component.translatable("enchantment.level." + option.nextLevel());
 		return Component.empty().append(option.enchant().value().description()).append(" ").append(level);
-	}
-
-	private Component emptyMessage() {
-		if (this.menu.getSlot(LibraryEnchantMenu.ITEM_SLOT).getItem().isEmpty()) {
-			return Component.translatable("archive.table.place_item");
-		}
-		return Component.translatable("archive.table.nothing_fits");
 	}
 
 	private List<Component> tooltip(Option option) {
