@@ -4,6 +4,7 @@
 	"item.archive.tome": "Tome",
 	"archive.tome.max_level": "Max level: %s",
 	"archive.tome.applies_to": "Applies to:",
+	"archive.tome.incompatible_with": "Incompatible with:",
 	"archive.tome.no_description": "An enchantment whose purpose is not recorded in the Archive.",
 	"enchantment.minecraft.protection.desc": "Reduces most kinds of damage.",
 	"enchantment.minecraft.fire_protection.desc": "Reduces fire damage and burn time. No longer obtainable; see Resilience.",

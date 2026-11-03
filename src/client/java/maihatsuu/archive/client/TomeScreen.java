@@ -1,5 +1,6 @@
 package maihatsuu.archive.client;
 
+import maihatsuu.archive.registry.ModItems;
 import maihatsuu.archive.tome.TomeItem;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,9 +11,11 @@ import net.minecraft.client.gui.screens.inventory.PageButton;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -20,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +84,13 @@ public class TomeScreen extends Screen {
 
 	@Override
 	protected void init() {
-		List<FormattedCharSequence> lines = this.font.split(description(), TEXT_WIDTH);
+		List<FormattedCharSequence> lines = new ArrayList<>(this.font.split(description(), TEXT_WIDTH));
+		List<Component> conflicts = incompatibleEnchants();
+		if (!conflicts.isEmpty()) {
+			lines.add(FormattedCharSequence.EMPTY);
+			lines.addAll(this.font.split(Component.translatable("archive.tome.incompatible_with").withColor(0x555555), TEXT_WIDTH));
+			lines.addAll(this.font.split(ComponentUtils.formatList(conflicts, Component.literal(", ")), TEXT_WIDTH));
+		}
 		this.top = SINGLE_TOP;
 		this.bottom = SINGLE_BOTTOM;
 		this.pages = paginate(lines);
@@ -158,6 +168,19 @@ public class TomeScreen extends Screen {
 			return true;
 		}
 		return false;
+	}
+
+	/** Obtainable enchants that can't share an item with this one, by name (both directions of the exclusive sets). */
+	private List<Component> incompatibleEnchants() {
+		if (this.minecraft.level == null) {
+			return List.of();
+		}
+		return this.minecraft.level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).listElements()
+				.filter(other -> !other.equals(this.enchant) && ModItems.isTomeEnchant(other)
+						&& !Enchantment.areCompatible(this.enchant, other))
+				.map(other -> other.value().description())
+				.sorted(Comparator.comparing(Component::getString))
+				.toList();
 	}
 
 	private Component description() {
