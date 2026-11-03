@@ -49,6 +49,19 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 	}
 
 	@GameTest(template = EMPTY_STRUCTURE)
+	public void tridentAndMaceRepair(GameTestHelper helper) {
+		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		ItemStack trident = anvil(player, damaged(new ItemStack(Items.TRIDENT), 100), new ItemStack(Items.PRISMARINE_SHARD)).getSlot(2).getItem();
+		helper.assertTrue(trident.is(Items.TRIDENT) && trident.getDamageValue() == 0, "a prismarine shard should fully repair a trident");
+		ItemStack mace = anvil(player, damaged(new ItemStack(Items.MACE), 100), new ItemStack(Items.BREEZE_ROD)).getSlot(2).getItem();
+		helper.assertTrue(mace.is(Items.MACE) && mace.getDamageValue() == 0, "a breeze rod should fully repair a mace");
+		helper.assertTrue(anvil(player, damaged(new ItemStack(Items.TRIDENT), 100), new ItemStack(Items.BREEZE_ROD))
+				.getSlot(2).getItem().isEmpty(), "a breeze rod shouldn't repair a trident");
+		player.discard();
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE)
 	public void anvilRejectsCombiningAndBooks(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
 		helper.assertTrue(anvil(player, damaged(new ItemStack(Items.IRON_PICKAXE), 100), new ItemStack(Items.IRON_PICKAXE))

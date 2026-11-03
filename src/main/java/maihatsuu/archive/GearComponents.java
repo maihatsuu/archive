@@ -11,12 +11,11 @@ import net.minecraft.world.item.component.Unbreakable;
 import java.util.List;
 import java.util.Map;
 
-/** Default item components: durability overrides from config, and unbreakable rare gear. */
+/** Default item components: durability overrides from config, and unbreakable netherite gear. */
 public final class GearComponents {
 	private static final List<Item> UNBREAKABLE = List.of(
 			Items.NETHERITE_SWORD, Items.NETHERITE_PICKAXE, Items.NETHERITE_AXE, Items.NETHERITE_SHOVEL, Items.NETHERITE_HOE,
-			Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS,
-			Items.TRIDENT, Items.MACE);
+			Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS);
 
 	static void register() {
 		DefaultItemComponentEvents.MODIFY.register(context -> {

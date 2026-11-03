@@ -8,6 +8,7 @@
 		"xp.ServerPlayerXpMixin",
 		"gear.BlockStateBaseMixin",
 		"gear.TiersMixin",
+		"gear.TridentRepairMixin",
 		"anvil.AnvilBlockMixin",
 		"anvil.AnvilMenuMixin",
 		"grindstone.GrindstoneMenuMixin",

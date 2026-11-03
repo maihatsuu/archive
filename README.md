@@ -15,7 +15,8 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 - **No vanilla enchanted books** from loot chests, fishing, bartering, hero-of-the-village gifts or villager trades.
 - **Flat XP curve.** Every level costs 50 XP, levels cap at 100, a Bottle o' Enchanting gives one level, and you drop 50% of your XP on death.
 - **Gear.**
-  - Netherite gear, the trident and the mace are unbreakable.
+  - Netherite gear is unbreakable.
+  - The trident repairs with prismarine shards and the mace with breeze rods (vanilla), one unit for a full repair.
   - Diamond mining speed is 12 and netherite is 19.
   - Deepslate blocks have hardness 2.0, and deepslate ores 3.5.
   - Obsidian, crying obsidian, respawn anchors and ender chests have hardness 20.0.

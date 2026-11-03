@@ -10,16 +10,17 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
-/** Phase 3: unbreakable gear, tool speeds, block hardness. */
+/** Phase 3: unbreakable netherite gear, tool speeds, block hardness. */
 public class GearTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void rareGearIsUnbreakable(GameTestHelper helper) {
-		for (ItemStack stack : new ItemStack[]{new ItemStack(Items.NETHERITE_PICKAXE), new ItemStack(Items.NETHERITE_CHESTPLATE),
-				new ItemStack(Items.TRIDENT), new ItemStack(Items.MACE)}) {
+		for (ItemStack stack : new ItemStack[]{new ItemStack(Items.NETHERITE_PICKAXE), new ItemStack(Items.NETHERITE_CHESTPLATE)}) {
 			helper.assertTrue(stack.has(DataComponents.UNBREAKABLE), stack.getItem() + " should be unbreakable");
 			helper.assertTrue(!stack.isDamageableItem(), stack.getItem() + " should not take damage");
 		}
-		helper.assertTrue(new ItemStack(Items.DIAMOND_PICKAXE).isDamageableItem(), "diamond pickaxe should still take damage");
+		for (ItemStack stack : new ItemStack[]{new ItemStack(Items.DIAMOND_PICKAXE), new ItemStack(Items.TRIDENT), new ItemStack(Items.MACE)}) {
+			helper.assertTrue(stack.isDamageableItem(), stack.getItem() + " should take damage");
+		}
 		helper.succeed();
 	}
 
