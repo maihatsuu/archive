@@ -2,7 +2,6 @@ package maihatsuu.archive.tome;
 
 import maihatsuu.archive.registry.ModComponents;
 import maihatsuu.archive.registry.ModItems;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -10,12 +9,10 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -51,13 +48,6 @@ public class TomeItem extends Item {
 	public Component getName(ItemStack stack) {
 		Holder<Enchantment> enchant = getEnchant(stack);
 		return enchant == null ? super.getName(stack) : Component.translatable("item.archive.tome.named", enchant.value().description());
-	}
-
-	@Override
-	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-		if (getEnchant(stack) != null) {
-			tooltip.add(Component.translatable("item.archive.tome.hint").withStyle(ChatFormatting.GRAY));
-		}
 	}
 
 	@Override

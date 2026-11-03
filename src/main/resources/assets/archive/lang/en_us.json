@@ -2,7 +2,6 @@
 	"enchantment.archive.resilience": "Resilience",
 	"item.archive.tome": "Tome",
 	"item.archive.tome.named": "Tome of %s",
-	"item.archive.tome.hint": "Shelve near an enchanting table to unlock it",
 	"itemGroup.archive": "Archive",
 	"archive.tome.max_level": "Max level: %s",
 	"archive.tome.applies_to": "Applies to:",
