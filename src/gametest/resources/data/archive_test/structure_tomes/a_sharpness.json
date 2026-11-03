@@ -1,0 +1,2 @@
+{ "tables": { "archive_test:tome_target": {
+    "tomes": { "minecraft:sharpness": 1, "othermod:not_installed": 5 } } } }

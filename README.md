@@ -46,7 +46,7 @@ The enchantment and tag changes are data, not code. They're always on, and a dat
   "levels": [ { "xp": 5, "lapis": 1 }, { "xp": 10, "lapis": 2 } ] }
 ```
 
-**Structure tomes:** `src/main/resources/archive/structure_tomes.json` (bundled in the jar, read at startup). Each listed loot table gets one extra pool with one roll. `empty_weight` is the weight of "no tome".
+**Structure tomes:** `data/<namespace>/structure_tomes/<any>.json`, from any datapack or mod, reloaded with `/reload`. Each loot table listed in a file gets one extra pool with one roll from that file, so two files naming the same table give two rolls. `empty_weight` is the weight of "no tome". Unknown enchantments are skipped with a warning, so a file can list enchants from mods that may not be installed. To change or remove another pack's entries, override its file at the same path.
 ```json
 { "tables": { "minecraft:chests/stronghold_library": {
     "empty_weight": 10,

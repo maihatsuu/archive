@@ -13,6 +13,7 @@
 		"grindstone.GrindstoneMenuMixin",
 		"loot.AbstractVillagerMixin",
 		"loot.LootTableMixin",
+		"loot.ReloadableServerRegistriesMixin",
 		"table.EnchantingTableBlockMixin"
 	],
 	"injectors": {

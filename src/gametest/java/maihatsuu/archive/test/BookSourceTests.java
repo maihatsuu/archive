@@ -121,4 +121,24 @@ public class BookSourceTests implements FabricGameTest {
 		helper.assertTrue(refused.isEmpty(), "set_tome should refuse mending");
 		helper.succeed();
 	}
+
+	/** Each structure_tomes file adds its own pool; unknown enchants are skipped (test datapack). */
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void structureTomesFromDatapack(GameTestHelper helper) {
+		LootTable table = helper.getLevel().getServer().reloadableRegistries().getLootTable(
+				ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath("archive_test", "tome_target")));
+		LootParams params = new LootParams.Builder(helper.getLevel()).create(LootContextParamSets.EMPTY);
+		for (int i = 0; i < 50; i++) {
+			List<String> enchants = table.getRandomItems(params).stream()
+					.map(stack -> {
+						helper.assertTrue(stack.is(ModItems.TOME), "structure tome pool produced " + stack);
+						return stack.get(ModComponents.TOME_ENCHANTMENT).getRegisteredName();
+					})
+					.sorted()
+					.toList();
+			helper.assertTrue(enchants.equals(List.of("minecraft:efficiency", "minecraft:sharpness")),
+					"expected one sharpness and one efficiency tome, got " + enchants);
+		}
+		helper.succeed();
+	}
 }
