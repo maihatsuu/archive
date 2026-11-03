@@ -1,6 +1,7 @@
 package maihatsuu.archive.client;
 
 import maihatsuu.archive.tome.TomeItem;
+import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -10,10 +11,17 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Read-only page for a tome: enchant name, max level, description and the gear it applies to. */
 public class TomeScreen extends Screen {
@@ -22,17 +30,31 @@ public class TomeScreen extends Screen {
 	private static final int TEXT_WIDTH = 114;
 	private static final int TEXT_BOTTOM = 172;
 	private static final int ICON_STEP = 18;
+	private static final long CYCLE_MS = 1000;
+	/** Items in one of these tags share a slot that cycles through them, like the recipe book. */
+	private static final List<TagKey<Item>> GROUPS = List.of(
+			ItemTags.SWORDS, ItemTags.AXES, ItemTags.PICKAXES, ItemTags.SHOVELS, ItemTags.HOES,
+			ItemTags.HEAD_ARMOR, ItemTags.SKULLS, ItemTags.CHEST_ARMOR, ItemTags.LEG_ARMOR, ItemTags.FOOT_ARMOR);
 
 	private final Holder<Enchantment> enchant;
-	private final List<ItemStack> appliesTo;
+	/** One slot per kind of gear; a slot with several items cycles through them. */
+	private final List<List<ItemStack>> appliesTo;
 	private List<FormattedCharSequence> descriptionLines = List.of();
 
 	public TomeScreen(ItemStack tome) {
 		super(tome.getHoverName());
 		this.enchant = TomeItem.getEnchant(tome);
-		this.appliesTo = enchant.value().definition().supportedItems().stream()
-				.map(item -> new ItemStack(item))
-				.toList();
+		this.appliesTo = groupItems(enchant.value().definition().supportedItems());
+	}
+
+	/** Groups items by the first {@link #GROUPS} tag they're in; items in none get their own slot. */
+	private static List<List<ItemStack>> groupItems(HolderSet<Item> items) {
+		Map<Object, List<ItemStack>> slots = new LinkedHashMap<>();
+		for (Holder<Item> item : items) {
+			Object key = GROUPS.stream().filter(item::is).findFirst().<Object>map(tag -> tag).orElse(item);
+			slots.computeIfAbsent(key, k -> new ArrayList<>()).add(new ItemStack(item));
+		}
+		return List.copyOf(slots.values());
 	}
 
 	@Override
@@ -82,10 +104,12 @@ public class TomeScreen extends Screen {
 		boolean overflow = this.appliesTo.size() > capacity;
 		int shown = overflow ? Math.max(0, capacity - 1) : this.appliesTo.size();
 		ItemStack hovered = ItemStack.EMPTY;
+		long cycle = Util.getMillis() / CYCLE_MS;
 		for (int i = 0; i < shown; i++) {
 			int x = left + (i % perRow) * ICON_STEP;
 			int iy = y + (i / perRow) * ICON_STEP;
-			ItemStack stack = this.appliesTo.get(i);
+			List<ItemStack> slot = this.appliesTo.get(i);
+			ItemStack stack = slot.get((int) (cycle % slot.size()));
 			graphics.renderItem(stack, x, iy);
 			if (mouseX >= x && mouseX < x + 16 && mouseY >= iy && mouseY < iy + 16) {
 				hovered = stack;
