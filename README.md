@@ -2,7 +2,7 @@
 
 An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the client and the server.
 
-- **Tomes replace enchanted books.** A tome holds one enchant, with no level. Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it.
+- **Tomes replace enchanted books.** A tome holds one enchant, with no level. Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it. Curse tomes exist too ("Cursed Tome of Binding", red cover) and let you put curses on gear on purpose, e.g. for minigames.
 - **Library enchanting table.** The table lists every shelved enchant that fits the item and sells it one level at a time for a fixed XP + lapis cost, with no randomness. Conflicting enchants are blocked; use the grindstone first.
 - **Bookshelves unlock low levels.** Without a tome, plain bookshelves around the table unlock common enchants up to a per-enchant limit: level I with the table alone, II with 5 bookshelves, III with 10. Higher levels need a tome. Chiseled bookshelves don't count.
 - **Shelf particles.** Enchant particles float to the table from every bookshelf and chiseled bookshelf within range (a 9×9×9 cube by default), so you can see which shelves count.
@@ -58,7 +58,9 @@ The enchantment and tag changes are data, not code. They're always on, and a dat
     "tomes": { "minecraft:sharpness": 5, "minecraft:efficiency": 5 } } } }
 ```
 
-The `archive:set_tome` loot function (`{"function": "archive:set_tome", "enchantment": "minecraft:sharpness"}`) can also be used in your own loot tables. It refuses unobtainable enchants and curses.
+The `archive:set_tome` loot function (`{"function": "archive:set_tome", "enchantment": "minecraft:sharpness"}`) can also be used in your own loot tables. It refuses unobtainable enchants.
+
+**Tome text (resource packs):** `enchantment.<namespace>.<path>.desc` is the description shown when reading a tome. Curse tomes are named "Cursed Tome of %s" using `enchantment.<namespace>.<path>.cursed_tome` (e.g. `"Binding"`); curses without that key use their full name.
 
 **Block tags:** `#archive:deepslate_hardness`, `#archive:deepslate_ore_hardness` and `#archive:obsidian_hardness` choose which blocks get the new hardness values.
 

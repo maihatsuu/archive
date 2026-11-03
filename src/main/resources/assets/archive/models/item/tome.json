@@ -2,5 +2,8 @@
 	"parent": "minecraft:item/generated",
 	"textures": {
 		"layer0": "archive:item/tome"
-	}
+	},
+	"overrides": [
+		{ "predicate": { "archive:cursed": 1 }, "model": "archive:item/cursed_tome" }
+	]
 }

@@ -28,6 +28,9 @@ public class TomeTests implements FabricGameTest {
 		helper.assertTrue(tome.getHoverName().getContents() instanceof TranslatableContents contents
 				&& contents.getKey().equals("item.archive.tome.named"), "tome name should be 'Tome of ...'");
 		helper.assertTrue(tome.is(ItemTags.BOOKSHELF_BOOKS), "tome should fit in chiseled bookshelves");
+		ItemStack cursed = TomeItem.of(DataTests.enchant(helper, "minecraft", "binding_curse"));
+		helper.assertTrue(cursed.getHoverName().getContents() instanceof TranslatableContents contents
+				&& contents.getKey().equals("item.archive.tome.cursed"), "curse tome name should be 'Cursed Tome of ...'");
 		helper.succeed();
 	}
 
@@ -36,7 +39,7 @@ public class TomeTests implements FabricGameTest {
 		helper.assertTrue(ModItems.isTomeEnchant(DataTests.enchant(helper, "minecraft", "sharpness")), "sharpness tomes allowed");
 		helper.assertTrue(ModItems.isTomeEnchant(DataTests.enchant(helper, "archive", "resilience")), "resilience tomes allowed");
 		helper.assertTrue(!ModItems.isTomeEnchant(DataTests.enchant(helper, "minecraft", "mending")), "no mending tomes");
-		helper.assertTrue(!ModItems.isTomeEnchant(DataTests.enchant(helper, "minecraft", "binding_curse")), "no curse tomes");
+		helper.assertTrue(ModItems.isTomeEnchant(DataTests.enchant(helper, "minecraft", "binding_curse")), "curse tomes allowed");
 		helper.succeed();
 	}
 

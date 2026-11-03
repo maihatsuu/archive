@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Loot function {@code archive:set_tome}: sets which enchant a tome holds.
- * Refuses unobtainable enchants and curses (the tome is dropped from the loot).
+ * Refuses unobtainable enchants (the tome is dropped from the loot).
  */
 public class SetTomeFunction extends LootItemConditionalFunction {
 	public static final MapCodec<SetTomeFunction> CODEC = RecordCodecBuilder.mapCodec(instance -> commonFields(instance)
@@ -50,7 +50,7 @@ public class SetTomeFunction extends LootItemConditionalFunction {
 		// Checked at roll time: enchantment tags aren't bound yet when loot tables load.
 		if (!ModItems.isTomeEnchant(this.enchant)) {
 			if (WARNED.add(this.enchant.getRegisteredName())) {
-				Archive.LOGGER.warn("archive:set_tome refused {}: it is unobtainable or a curse", this.enchant.getRegisteredName());
+				Archive.LOGGER.warn("archive:set_tome refused {}: it is unobtainable", this.enchant.getRegisteredName());
 			}
 			return ItemStack.EMPTY;
 		}

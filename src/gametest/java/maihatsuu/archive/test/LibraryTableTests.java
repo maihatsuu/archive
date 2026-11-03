@@ -125,6 +125,25 @@ public class LibraryTableTests implements FabricGameTest {
 	}
 
 	@GameTest(template = EMPTY_STRUCTURE)
+	public void curseTomesCanBeBought(GameTestHelper helper) {
+		helper.setBlock(TABLE, Blocks.ENCHANTING_TABLE);
+		Holder<Enchantment> vanishing = DataTests.enchant(helper, "minecraft", "vanishing_curse");
+		shelf(helper, SHELF).setItem(0, TomeItem.of(vanishing));
+		ServerPlayer player = survivalPlayer(helper);
+		player.giveExperienceLevels(30);
+		BlockPos tablePos = helper.absolutePos(TABLE);
+		LibraryEnchantMenu menu = new LibraryEnchantMenu(1, player.getInventory(),
+				LibraryEnchantMenu.scanEntries(helper.getLevel(), tablePos), ContainerLevelAccess.create(helper.getLevel(), tablePos));
+		menu.getSlot(LibraryEnchantMenu.ITEM_SLOT).set(new ItemStack(Items.IRON_SWORD));
+		menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).set(new ItemStack(Items.LAPIS_LAZULI, 10));
+		helper.assertTrue(menu.tryBuy(player, vanishing), "should buy curse of vanishing from a shelved curse tome");
+		helper.assertTrue(EnchantmentHelper.getItemEnchantmentLevel(vanishing,
+				menu.getSlot(LibraryEnchantMenu.ITEM_SLOT).getItem()) == 1, "sword should have curse of vanishing");
+		player.discard();
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE)
 	public void costTableLoadsFromData(GameTestHelper helper) {
 		Holder<Enchantment> efficiency = DataTests.enchant(helper, "minecraft", "efficiency");
 		helper.assertTrue(EnchantCosts.cost(efficiency, 1).equals(new EnchantCosts.LevelCost(1, 1)), "efficiency I from data");

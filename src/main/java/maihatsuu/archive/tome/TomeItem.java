@@ -4,6 +4,7 @@ import maihatsuu.archive.registry.ModComponents;
 import maihatsuu.archive.registry.ModItems;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +48,19 @@ public class TomeItem extends Item {
 	@Override
 	public Component getName(ItemStack stack) {
 		Holder<Enchantment> enchant = getEnchant(stack);
-		return enchant == null ? super.getName(stack) : Component.translatable("item.archive.tome.named", enchant.value().description());
+		if (enchant == null) {
+			return super.getName(stack);
+		}
+		if (enchant.is(EnchantmentTags.CURSE)) {
+			// "Cursed Tome of Binding" rather than "Tome of Curse of Binding". The short name comes from
+			// the lang key enchantment.<namespace>.<path>.cursed_tome; curses without one use their full name.
+			String key = enchant.unwrapKey()
+					.map(k -> "enchantment." + k.location().getNamespace() + "." + k.location().getPath() + ".cursed_tome")
+					.orElse("");
+			return Component.translatable("item.archive.tome.cursed",
+					Component.translatableWithFallback(key, enchant.value().description().getString()));
+		}
+		return Component.translatable("item.archive.tome.named", enchant.value().description());
 	}
 
 	@Override

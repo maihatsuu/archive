@@ -8,7 +8,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -22,9 +21,9 @@ public final class ModItems {
 	public static final TomeItem TOME = Registry.register(BuiltInRegistries.ITEM, Archive.id("tome"),
 			new TomeItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
 
-	/** Enchants a tome may hold: not unobtainable, not a curse. */
+	/** Enchants a tome may hold: anything not unobtainable, curses included (for minigames and the like). */
 	public static boolean isTomeEnchant(Holder<Enchantment> enchant) {
-		return !enchant.is(ModTags.UNOBTAINABLE) && !enchant.is(EnchantmentTags.CURSE);
+		return !enchant.is(ModTags.UNOBTAINABLE);
 	}
 
 	private static boolean hiddenInCreative(ItemStack stack) {
