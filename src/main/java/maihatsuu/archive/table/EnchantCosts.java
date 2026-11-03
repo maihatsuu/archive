@@ -19,14 +19,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
- * Fixed per-level enchanting costs, from {@code data/<namespace>/enchant_costs/*.json}:
+ * Fixed per-level enchanting costs and bookshelf caps, from {@code data/<namespace>/enchant_costs/*.json}:
  * <pre>
  * { "enchantment": "minecraft:sharpness",
+ *   "shelf_max": 2,
  *   "levels": [ { "xp": 5, "lapis": 1 }, { "xp": 10, "lapis": 2 } ] }
  * </pre>
- * Levels past the end of the list, and enchants without a file, use {@link #defaultCost(int)}.
+ * Both fields are optional. Levels past the end of the list, and enchants without levels, use
+ * {@link #defaultCost(int)}. {@code shelf_max} is the highest level plain bookshelves can unlock
+ * without a tome (0 or missing: none). Several files may name the same enchant: they're applied in
+ * file id order, and each field a later file sets replaces the earlier value.
  */
 public final class EnchantCosts {
 	public record LevelCost(int xpLevels, int lapis) {
@@ -35,9 +41,21 @@ public final class EnchantCosts {
 	}
 
 	private static Map<ResourceLocation, List<LevelCost>> table = Map.of();
+	private static Map<ResourceLocation, Integer> shelfMax = Map.of();
 
-	static void setTable(Map<ResourceLocation, List<LevelCost>> newTable) {
+	static void setTables(Map<ResourceLocation, List<LevelCost>> newTable, Map<ResourceLocation, Integer> newShelfMax) {
 		table = Map.copyOf(newTable);
+		shelfMax = Map.copyOf(newShelfMax);
+	}
+
+	/** Highest level plain bookshelves unlock for this enchant without a tome; 0 if none. */
+	public static int shelfMax(Holder<Enchantment> enchant) {
+		return enchant.unwrapKey().map(key -> shelfMax.getOrDefault(key.location(), 0)).orElse(0);
+	}
+
+	/** Enchants that bookshelves can unlock (shelf_max above 0). */
+	public static Set<ResourceLocation> shelfEnchants() {
+		return shelfMax.keySet();
 	}
 
 	/** Placeholder formula until the cost table is filled in. */
@@ -85,22 +103,35 @@ public final class EnchantCosts {
 		@Override
 		protected void apply(Map<ResourceLocation, JsonElement> files, ResourceManager manager, ProfilerFiller profiler) {
 			Map<ResourceLocation, List<LevelCost>> parsed = new HashMap<>();
-			files.forEach((file, json) -> {
+			Map<ResourceLocation, Integer> parsedShelfMax = new HashMap<>();
+			// File id order, so later files' fields win predictably.
+			new TreeMap<>(files).forEach((file, json) -> {
 				try {
 					JsonObject root = json.getAsJsonObject();
 					ResourceLocation enchant = ResourceLocation.parse(root.get("enchantment").getAsString());
-					List<LevelCost> levels = new ArrayList<>();
-					for (JsonElement level : root.getAsJsonArray("levels")) {
-						JsonObject cost = level.getAsJsonObject();
-						levels.add(new LevelCost(cost.get("xp").getAsInt(), cost.get("lapis").getAsInt()));
+					List<LevelCost> levels = null;
+					if (root.has("levels")) {
+						levels = new ArrayList<>();
+						for (JsonElement level : root.getAsJsonArray("levels")) {
+							JsonObject cost = level.getAsJsonObject();
+							levels.add(new LevelCost(cost.get("xp").getAsInt(), cost.get("lapis").getAsInt()));
+						}
 					}
-					parsed.put(enchant, List.copyOf(levels));
+					Integer shelf = root.has("shelf_max") ? root.get("shelf_max").getAsInt() : null;
+					// Only store once the whole file has parsed.
+					if (levels != null) {
+						parsed.put(enchant, List.copyOf(levels));
+					}
+					if (shelf != null) {
+						parsedShelfMax.put(enchant, shelf);
+					}
 				} catch (Exception e) {
 					Archive.LOGGER.error("Invalid enchant cost file {}", file, e);
 				}
 			});
-			setTable(parsed);
-			Archive.LOGGER.info("Loaded enchant costs for {} enchantments", parsed.size());
+			parsedShelfMax.values().removeIf(max -> max <= 0);
+			setTables(parsed, parsedShelfMax);
+			Archive.LOGGER.info("Loaded enchant costs for {} enchantments, bookshelf caps for {}", parsed.size(), parsedShelfMax.size());
 		}
 	}
 

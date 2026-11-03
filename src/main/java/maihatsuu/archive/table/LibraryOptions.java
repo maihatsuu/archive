@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.ToIntFunction;
 
 /**
  * What the library table offers for an item. Shared by the client screen (for display) and the
@@ -19,7 +20,9 @@ import java.util.function.BiFunction;
  */
 public final class LibraryOptions {
 	public enum State {
-		AVAILABLE, TOO_EXPENSIVE, INCOMPATIBLE, MAXED
+		AVAILABLE, TOO_EXPENSIVE, INCOMPATIBLE, MAXED,
+		/** The next level needs more bookshelves or a tome. */
+		LOCKED
 	}
 
 	/**
@@ -32,10 +35,11 @@ public final class LibraryOptions {
 	/**
 	 * Options for {@code item}, given the enchants found on shelves. Enchants that can't go on the item at all are left out.
 	 *
-	 * @param cost cost of buying (enchant, level)
+	 * @param cost        cost of buying (enchant, level)
+	 * @param unlockedMax highest level of each enchant that can be bought here
 	 */
 	public static List<Option> compute(List<Holder<Enchantment>> available, ItemStack item, Player player, int lapis,
-									   BiFunction<Holder<Enchantment>, Integer, LevelCost> cost) {
+									   BiFunction<Holder<Enchantment>, Integer, LevelCost> cost, ToIntFunction<Holder<Enchantment>> unlockedMax) {
 		List<Option> options = new ArrayList<>();
 		if (item.isEmpty()) {
 			return options;
@@ -55,7 +59,9 @@ public final class LibraryOptions {
 			LevelCost levelCost = cost.apply(enchant, next);
 			Holder<Enchantment> conflict = current == 0 ? findConflict(enchant, existing) : null;
 			State state;
-			if (conflict != null) {
+			if (next > unlockedMax.applyAsInt(enchant)) {
+				state = State.LOCKED;
+			} else if (conflict != null) {
 				state = State.INCOMPATIBLE;
 			} else if (!player.hasInfiniteMaterials() && (player.experienceLevel < levelCost.xpLevels() || lapis < levelCost.lapis())) {
 				state = State.TOO_EXPENSIVE;

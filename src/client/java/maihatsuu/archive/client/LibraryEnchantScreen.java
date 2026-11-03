@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import maihatsuu.archive.registry.ModItems;
 import maihatsuu.archive.table.BuyEnchantPayload;
 import maihatsuu.archive.table.LibraryEnchantMenu;
+import maihatsuu.archive.table.LibraryEntry;
 import maihatsuu.archive.table.LibraryOptions.Option;
 import maihatsuu.archive.table.LibraryOptions.State;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -82,9 +83,9 @@ public class LibraryEnchantScreen extends AbstractContainerScreen<LibraryEnchant
 		int top = this.topPos;
 		graphics.blit(BACKGROUND, left, top, 0, 0, this.imageWidth, this.imageHeight);
 
-		// Book corner: how many enchants the shelves hold.
+		// Book corner: how many tomes are shelved nearby.
 		graphics.renderItem(new ItemStack(ModItems.TOME), left + 22, top + 18);
-		String count = String.valueOf(this.menu.getEntries().size());
+		String count = String.valueOf(this.menu.getEntries().stream().filter(LibraryEntry::fromTome).count());
 		graphics.drawString(this.font, count, left + 30 - this.font.width(count) / 2, top + 36, 0x404040, false);
 
 		int listLeft = left + LIST_X;
@@ -131,9 +132,9 @@ public class LibraryEnchantScreen extends AbstractContainerScreen<LibraryEnchant
 		String name = this.font.plainSubstrByWidth(rowName(option).getString(), TEXT_WIDTH);
 		graphics.drawString(this.font, name, x + 20, y + 2, nameColor, false);
 
-		if (option.state() == State.MAXED) {
-			Component max = Component.translatable("archive.table.max");
-			graphics.drawString(this.font, max, x + 20 + TEXT_WIDTH - this.font.width(max), y + 9, COST_DISABLED_COLOR);
+		if (option.state() == State.MAXED || option.state() == State.LOCKED) {
+			Component label = Component.translatable(option.state() == State.MAXED ? "archive.table.max" : "archive.table.locked");
+			graphics.drawString(this.font, label, x + 20 + TEXT_WIDTH - this.font.width(label), y + 9, COST_DISABLED_COLOR);
 			return;
 		}
 		ItemStack lapis = new ItemStack(Items.LAPIS_LAZULI, option.cost().lapis());
@@ -164,6 +165,12 @@ public class LibraryEnchantScreen extends AbstractContainerScreen<LibraryEnchant
 		lines.add(rowName(option).copy().withStyle(ChatFormatting.WHITE));
 		switch (option.state()) {
 			case MAXED -> lines.add(Component.translatable("archive.table.tooltip.maxed").withStyle(ChatFormatting.GRAY));
+			case LOCKED -> {
+				int shelves = this.menu.entry(option.enchant()).map(LibraryEntry::shelvesForNext).orElse(0);
+				lines.add((shelves > 0
+						? Component.translatable("archive.table.tooltip.needs_shelves", shelves)
+						: Component.translatable("archive.table.tooltip.needs_tome")).withStyle(ChatFormatting.RED));
+			}
 			case INCOMPATIBLE -> lines.add(Component.translatable("archive.table.tooltip.incompatible",
 					option.conflict().value().description()).withStyle(ChatFormatting.RED));
 			default -> {

@@ -50,11 +50,14 @@
 	"enchantment.minecraft.vanishing_curse.desc": "The item disappears when you die.",
 	"enchantment.archive.resilience.desc": "Reduces damage from fire, explosions and projectiles, shortens burning, and reduces knockback. Chestplates only.",
 	"archive.table.max": "Max",
+	"archive.table.locked": "Locked",
 	"archive.table.place_item": "Place an item to enchant",
 	"archive.table.no_tomes": "No tomes shelved nearby",
-	"archive.table.nothing_fits": "No shelved tome fits this item",
+	"archive.table.nothing_fits": "Nothing here fits this item",
 	"archive.table.tooltip.cost": "Cost: %s levels, %s lapis",
 	"archive.table.tooltip.too_expensive": "Not enough levels or lapis",
 	"archive.table.tooltip.incompatible": "Incompatible with %s",
-	"archive.table.tooltip.maxed": "Already at max level"
+	"archive.table.tooltip.maxed": "Already at max level",
+	"archive.table.tooltip.needs_shelves": "Needs %s bookshelves nearby",
+	"archive.table.tooltip.needs_tome": "Needs a tome"
 }

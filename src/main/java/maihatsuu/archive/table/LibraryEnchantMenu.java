@@ -1,7 +1,6 @@
 package maihatsuu.archive.table;
 
 import com.mojang.datafixers.util.Pair;
-import maihatsuu.archive.ArchiveConfig;
 import maihatsuu.archive.registry.ModMenus;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -86,9 +85,12 @@ public class LibraryEnchantMenu extends AbstractContainerMenu {
 
 	/** Server: scan the shelves and build the data sent to the client. */
 	public static List<LibraryEntry> scanEntries(Level level, BlockPos pos) {
-		return LibraryScan.scan(level, pos, ArchiveConfig.get().tableRadius).stream()
-				.map(enchant -> new LibraryEntry(enchant, EnchantCosts.allLevels(enchant)))
-				.toList();
+		return LibraryUnlocks.compute(level, pos);
+	}
+
+	/** The entry for {@code enchant}, if the table offers it. */
+	public Optional<LibraryEntry> entry(Holder<Enchantment> enchant) {
+		return this.entries.stream().filter(entry -> entry.enchant().equals(enchant)).findFirst();
 	}
 
 	public List<LibraryEntry> getEntries() {
@@ -98,23 +100,26 @@ public class LibraryEnchantMenu extends AbstractContainerMenu {
 	public List<LibraryOptions.Option> options(Player player) {
 		List<Holder<Enchantment>> available = this.entries.stream().map(LibraryEntry::enchant).toList();
 		return LibraryOptions.compute(available, this.getSlot(ITEM_SLOT).getItem(), player, this.getSlot(LAPIS_SLOT).getItem().getCount(),
-				(enchant, level) -> this.entries.stream().filter(entry -> entry.enchant().equals(enchant)).findFirst()
-						.map(entry -> entry.cost(level)).orElseGet(() -> EnchantCosts.cost(enchant, level)));
+				(enchant, level) -> entry(enchant).map(entry -> entry.cost(level)).orElseGet(() -> EnchantCosts.cost(enchant, level)),
+				enchant -> entry(enchant).map(LibraryEntry::unlockedMax).orElse(0));
 	}
 
 	/**
 	 * Server: buy the next level of {@code enchant}. Everything is re-checked against the world:
-	 * the tome must still be shelved, and costs come from the server's cost table.
+	 * the tome or bookshelves must still unlock that level, and costs come from the server's cost table.
 	 */
 	public boolean tryBuy(ServerPlayer player, Holder<Enchantment> enchant) {
 		return this.access.evaluate((level, pos) -> {
-			List<Holder<Enchantment>> shelved = LibraryScan.scan(level, pos, ArchiveConfig.get().tableRadius);
-			if (!shelved.contains(enchant)) {
+			Optional<LibraryEntry> unlocked = LibraryUnlocks.compute(level, pos).stream()
+					.filter(entry -> entry.enchant().equals(enchant)).findFirst();
+			if (unlocked.isEmpty()) {
 				return false;
 			}
+			int unlockedMax = unlocked.get().unlockedMax();
 			ItemStack item = this.getSlot(ITEM_SLOT).getItem();
 			ItemStack lapis = this.getSlot(LAPIS_SLOT).getItem();
-			Optional<LibraryOptions.Option> option = LibraryOptions.compute(List.of(enchant), item, player, lapis.getCount(), EnchantCosts::cost)
+			Optional<LibraryOptions.Option> option = LibraryOptions.compute(List.of(enchant), item, player, lapis.getCount(), EnchantCosts::cost,
+							e -> unlockedMax)
 					.stream().findFirst();
 			if (option.isEmpty() || option.get().state() != LibraryOptions.State.AVAILABLE) {
 				return false;

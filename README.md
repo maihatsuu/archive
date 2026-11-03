@@ -4,6 +4,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 
 - **Tomes replace enchanted books.** A tome holds one enchant, with no level. Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it.
 - **Library enchanting table.** The table lists every shelved enchant that fits the item and sells it one level at a time for a fixed XP + lapis cost, with no randomness. Conflicting enchants are blocked; use the grindstone first.
+- **Bookshelves unlock low levels.** Without a tome, plain bookshelves around the table unlock common enchants up to a per-enchant limit: level I with the table alone, II with 5 bookshelves, III with 10. Higher levels need a tome. Chiseled bookshelves don't count.
 - **Removed enchants.** Mending, Unbreaking, and Fire/Blast/Projectile Protection can no longer be obtained, but they keep working on existing items.
 - **Changed enchants.**
   - Protection maxes at III.
@@ -29,6 +30,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 | `xpCurve`, `durability`, `mining`, `anvil`, `grindstone`, `libraryTable`, `stripBookLoot` | `true` | Toggle each subsystem |
 | `xpPerLevel` / `levelCap` / `deathXpFraction` | `50` / `100` / `0.5` | XP curve |
 | `tableRadius` | `6` | Bookshelf scan radius around the table |
+| `shelfSteps` | `[0, 5, 10]` | Plain bookshelves needed for each level unlocked without a tome |
 | `grindstoneRefundFraction` | `0.5` | Share of the table cost refunded by the grindstone |
 | `diamondSpeed` / `netheriteSpeed` | `12` / `19` | Tool mining speed (restart needed) |
 | `deepslateHardness` / `deepslateOreHardness` / `obsidianHardness` | `2.0` / `3.5` / `20.0` | Block hardness |
@@ -40,9 +42,10 @@ The enchantment and tag changes are data, not code. They're always on, and a dat
 
 ## Data formats
 
-**Enchant costs:** `data/<namespace>/enchant_costs/<any>.json`. Enchants without a file, and levels past the end of the list, use `5 × level` XP levels and `level` lapis.
+**Enchant costs:** `data/<namespace>/enchant_costs/<any>.json`. Both fields are optional. Enchants without `levels`, and levels past the end of the list, use `5 × level` XP levels and `level` lapis. `shelf_max` is the highest level plain bookshelves can unlock without a tome (missing or `0`: tome only, capped by the number of `shelfSteps`). Archive ships `shelf_max` files in `data/archive/enchant_costs/`. Several files may name the same enchant: they're applied in file id order, and each field a later file sets replaces the earlier value, so a pack can add costs without losing Archive's `shelf_max`.
 ```json
 { "enchantment": "minecraft:sharpness",
+  "shelf_max": 2,
   "levels": [ { "xp": 5, "lapis": 1 }, { "xp": 10, "lapis": 2 } ] }
 ```
 

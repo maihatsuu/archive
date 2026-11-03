@@ -40,6 +40,8 @@ public final class ArchiveConfig {
 
 	// Library enchanting table
 	public int tableRadius = 6;
+	/** Plain bookshelves needed for each level unlocked without a tome: {0, 5, 10} = I with none, II at 5, III at 10. */
+	public int[] shelfSteps = {0, 5, 10};
 
 	// Grindstone
 	public double grindstoneRefundFraction = 0.5;
