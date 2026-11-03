@@ -1,0 +1,3 @@
+{ "tables": { "archive_test:conditional_target": {
+    "conditions": [ { "condition": "minecraft:location_check", "predicate": { "biomes": [ "minecraft:deep_dark" ] } } ],
+    "tomes": { "minecraft:smite": 1 } } } }

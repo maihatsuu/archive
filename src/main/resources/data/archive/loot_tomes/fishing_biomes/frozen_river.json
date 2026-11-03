@@ -1,0 +1,31 @@
+{
+	"tables": {
+		"minecraft:gameplay/fishing/treasure": {
+			"conditions": [
+				{
+					"condition": "minecraft:location_check",
+					"predicate": {
+						"biomes": [
+							"minecraft:frozen_river",
+							"minecraft:snowy_plains",
+							"minecraft:ice_spikes",
+							"minecraft:grove",
+							"minecraft:frozen_peaks",
+							"minecraft:jagged_peaks",
+							"minecraft:snowy_slopes",
+							"minecraft:snowy_taiga",
+							"minecraft:snowy_beach"
+						]
+					}
+				}
+			],
+			"empty_weight": 20,
+			"tomes": {
+				"minecraft:frost_walker": 1,
+				"minecraft:quick_charge": 1,
+				"minecraft:multishot": 1,
+				"minecraft:piercing": 1
+			}
+		}
+	}
+}

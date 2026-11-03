@@ -1,0 +1,27 @@
+{
+	"tables": {
+		"minecraft:chests/end_city_treasure": {
+			"empty_weight": 15,
+			"tomes": {
+				"minecraft:protection": 1,
+				"archive:resilience": 1,
+				"minecraft:thorns": 1,
+				"minecraft:feather_falling": 10,
+				"minecraft:sharpness": 1,
+				"minecraft:smite": 1,
+				"minecraft:bane_of_arthropods": 1,
+				"minecraft:knockback": 1,
+				"minecraft:fire_aspect": 1,
+				"minecraft:looting": 5,
+				"minecraft:sweeping_edge": 5,
+				"minecraft:efficiency": 1,
+				"minecraft:fortune": 5,
+				"minecraft:silk_touch": 5,
+				"minecraft:power": 1,
+				"minecraft:punch": 5,
+				"minecraft:flame": 1,
+				"minecraft:infinity": 5
+			}
+		}
+	}
+}

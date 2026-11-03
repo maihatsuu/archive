@@ -1,0 +1,12 @@
+{
+	"tables": {
+		"minecraft:chests/trial_chambers/reward_rare": {
+			"empty_weight": 6,
+			"tomes": {
+				"minecraft:density": 1,
+				"minecraft:breach": 1,
+				"minecraft:wind_burst": 1
+			}
+		}
+	}
+}

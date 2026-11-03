@@ -1,0 +1,10 @@
+{
+	"tables": {
+		"minecraft:chests/ancient_city": {
+			"empty_weight": 9,
+			"tomes": {
+				"minecraft:swift_sneak": 1
+			}
+		}
+	}
+}

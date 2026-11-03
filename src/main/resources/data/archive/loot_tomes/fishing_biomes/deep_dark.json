@@ -1,0 +1,20 @@
+{
+	"tables": {
+		"minecraft:gameplay/fishing/treasure": {
+			"conditions": [
+				{
+					"condition": "minecraft:location_check",
+					"predicate": {
+						"biomes": [
+							"minecraft:deep_dark"
+						]
+					}
+				}
+			],
+			"empty_weight": 5,
+			"tomes": {
+				"minecraft:swift_sneak": 1
+			}
+		}
+	}
+}

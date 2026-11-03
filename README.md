@@ -51,11 +51,20 @@ The enchantment and tag changes are data, not code. They're always on, and a dat
   "levels": [ { "xp": 5, "lapis": 1 }, { "xp": 10, "lapis": 2 } ] }
 ```
 
-**Loot tomes:** `data/<namespace>/loot_tomes/<any>.json`, from any datapack or mod, reloaded with `/reload`. Each loot table listed in a file gets one extra pool with one roll from that file, so two files naming the same table give two rolls. `empty_weight` is the weight of "no tome". Unknown enchantments are skipped with a warning, so a file can list enchants from mods that may not be installed. To change or remove another pack's entries, override its file at the same path.
+**Loot tomes:** `data/<namespace>/loot_tomes/<any>.json`, from any datapack or mod, reloaded with `/reload`. Each loot table listed in a file gets one extra pool with one roll from that file, so two files naming the same table give two rolls. `empty_weight` is the weight of "no tome". Unknown enchantments are skipped with a warning, so a file can list enchants from mods that may not be installed. To change or remove another pack's entries, override its file at the same path. Archive ships one file per loot table at `data/archive/loot_tomes/<table path>.json` (for example `chests/stronghold_library.json`), generated from a spreadsheet with `tools/csv_to_loot_tomes.py`.
 ```json
 { "tables": { "minecraft:chests/stronghold_library": {
     "empty_weight": 10,
     "tomes": { "minecraft:sharpness": 5, "minecraft:efficiency": 5 } } } }
+```
+
+An optional `conditions` list takes vanilla loot conditions, which must all pass for the pool to roll (a broken condition skips just that pool, with an error in the log). Archive uses it for biome fishing: each file in `data/archive/loot_tomes/fishing_biomes/` adds a pool to fishing treasure that only rolls in its biomes, so every tome can be farmed somewhere.
+```json
+{ "tables": { "minecraft:gameplay/fishing/treasure": {
+    "conditions": [ { "condition": "minecraft:location_check",
+                      "predicate": { "biomes": [ "minecraft:deep_dark" ] } } ],
+    "empty_weight": 5,
+    "tomes": { "minecraft:swift_sneak": 1 } } } }
 ```
 
 The `archive:set_tome` loot function (`{"function": "archive:set_tome", "enchantment": "minecraft:sharpness"}`) can also be used in your own loot tables. It refuses unobtainable enchants.

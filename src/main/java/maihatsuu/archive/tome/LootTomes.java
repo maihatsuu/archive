@@ -3,11 +3,14 @@ package maihatsuu.archive.tome;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import maihatsuu.archive.Archive;
 import maihatsuu.archive.registry.ModItems;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -16,6 +19,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.ArrayList;
@@ -26,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Adds tome pools to loot tables, from datapack files {@code data/<namespace>/loot_tomes/<any>.json}:
  * <pre>
@@ -35,13 +41,17 @@ import java.util.TreeMap;
  * </pre>
  * Each table listed in each file gets one extra pool with one roll; {@code empty_weight} is the
  * weight of "no tome". Unknown enchantments are skipped, so files can name enchants from optional mods.
+ * An optional {@code conditions} list (vanilla loot conditions, e.g. {@code minecraft:location_check}
+ * with {@code biomes}) must all pass for the pool to roll at all; that's how fishing tomes depend on the biome.
  * <p>
  * Loot tables are built before reload listeners run, so the files are read by
  * {@code ReloadableServerRegistriesMixin} at the start of each reload, just before the tables are parsed.
  */
 public final class LootTomes {
-	private record TableEntry(ResourceLocation file, int emptyWeight, Map<ResourceLocation, Integer> tomes) {
+	private record TableEntry(ResourceLocation file, int emptyWeight, Map<ResourceLocation, Integer> tomes, @Nullable JsonElement conditions) {
 	}
+
+	private static final Codec<List<LootItemCondition>> CONDITIONS_CODEC = LootItemCondition.DIRECT_CODEC.listOf();
 
 	private static final String DIRECTORY = "loot_tomes";
 	private static final Gson GSON = new Gson();
@@ -56,6 +66,16 @@ public final class LootTomes {
 			var enchantments = registries.lookupOrThrow(Registries.ENCHANTMENT);
 			for (TableEntry entry : entries) {
 				LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1));
+				if (entry.conditions() != null) {
+					// Decoded here, not at load: biome and other registry ids need the registries.
+					var parsed = CONDITIONS_CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, registries), entry.conditions());
+					if (parsed.isError()) {
+						Archive.LOGGER.error("loot_tomes {}: invalid conditions for {}, skipping that pool: {}",
+								entry.file(), key.location(), parsed.error().orElseThrow().message());
+						continue;
+					}
+					parsed.getOrThrow().forEach(condition -> pool.when(() -> condition));
+				}
 				if (entry.emptyWeight() > 0) {
 					pool.add(EmptyLootItem.emptyItem().setWeight(entry.emptyWeight()));
 				}
@@ -89,7 +109,8 @@ public final class LootTomes {
 						tomes.put(ResourceLocation.parse(tome.getKey()), tome.getValue().getAsInt());
 					}
 					int emptyWeight = body.has("empty_weight") ? body.get("empty_weight").getAsInt() : 0;
-					fromFile.put(ResourceLocation.parse(table.getKey()), new TableEntry(file, emptyWeight, Collections.unmodifiableMap(tomes)));
+					JsonElement conditions = body.has("conditions") ? body.get("conditions").deepCopy() : null;
+					fromFile.put(ResourceLocation.parse(table.getKey()), new TableEntry(file, emptyWeight, Collections.unmodifiableMap(tomes), conditions));
 				}
 				fromFile.forEach((table, entry) -> parsed.computeIfAbsent(table, k -> new ArrayList<>()).add(entry));
 			} catch (Exception e) {

@@ -1,0 +1,13 @@
+{
+	"tables": {
+		"minecraft:chests/ruined_portal": {
+			"empty_weight": 12,
+			"tomes": {
+				"minecraft:fire_aspect": 1,
+				"minecraft:flame": 5,
+				"minecraft:binding_curse": 1,
+				"minecraft:vanishing_curse": 1
+			}
+		}
+	}
+}

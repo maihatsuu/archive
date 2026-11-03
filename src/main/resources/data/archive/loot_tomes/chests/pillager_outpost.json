@@ -1,0 +1,12 @@
+{
+	"tables": {
+		"minecraft:chests/pillager_outpost": {
+			"empty_weight": 5,
+			"tomes": {
+				"minecraft:quick_charge": 20,
+				"minecraft:multishot": 10,
+				"minecraft:piercing": 10
+			}
+		}
+	}
+}

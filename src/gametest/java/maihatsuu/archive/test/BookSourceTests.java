@@ -141,4 +141,39 @@ public class BookSourceTests implements FabricGameTest {
 		}
 		helper.succeed();
 	}
+
+	/** Archive's own loot tome data: the stronghold library (empty_weight 0) always gives a tome. */
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void strongholdLibraryAlwaysHasATome(GameTestHelper helper) {
+		LootTable table = helper.getLevel().getServer().reloadableRegistries().getLootTable(
+				ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.withDefaultNamespace("chests/stronghold_library")));
+		LootParams params = new LootParams.Builder(helper.getLevel())
+				.withParameter(LootContextParams.ORIGIN, helper.absoluteVec(Vec3.ZERO))
+				.create(LootContextParamSets.CHEST);
+		for (int i = 0; i < 20; i++) {
+			helper.assertTrue(table.getRandomItems(params).stream().anyMatch(stack -> stack.is(ModItems.TOME)),
+					"stronghold library roll " + i + " had no tome");
+		}
+		helper.succeed();
+	}
+
+	/** Conditional pools: a failing condition (wrong biome) skips the pool; broken conditions drop only that pool. */
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void lootTomeConditions(GameTestHelper helper) {
+		LootTable table = helper.getLevel().getServer().reloadableRegistries().getLootTable(
+				ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath("archive_test", "conditional_target")));
+		// The test area isn't a deep dark, so the smite pool never rolls; the broken punch pool was dropped at load.
+		BlockPos origin = helper.absolutePos(BlockPos.ZERO);
+		helper.assertTrue(!helper.getLevel().getBiome(origin).is(net.minecraft.world.level.biome.Biomes.DEEP_DARK), "test area shouldn't be deep dark");
+		LootParams params = new LootParams.Builder(helper.getLevel())
+				.withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(origin))
+				.create(LootContextParamSets.CHEST);
+		for (int i = 0; i < 30; i++) {
+			List<String> enchants = table.getRandomItems(params).stream()
+					.map(stack -> stack.get(ModComponents.TOME_ENCHANTMENT).getRegisteredName())
+					.toList();
+			helper.assertTrue(enchants.equals(List.of("minecraft:power")), "expected only the always-true power pool, got " + enchants);
+		}
+		helper.succeed();
+	}
 }

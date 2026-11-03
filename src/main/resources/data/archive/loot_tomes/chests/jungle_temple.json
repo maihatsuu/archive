@@ -1,0 +1,19 @@
+{
+	"tables": {
+		"minecraft:chests/jungle_temple": {
+			"empty_weight": 20,
+			"tomes": {
+				"minecraft:sharpness": 10,
+				"minecraft:smite": 10,
+				"minecraft:bane_of_arthropods": 10,
+				"minecraft:knockback": 5,
+				"minecraft:looting": 1,
+				"minecraft:sweeping_edge": 5,
+				"minecraft:power": 1,
+				"minecraft:punch": 1,
+				"minecraft:flame": 1,
+				"minecraft:infinity": 1
+			}
+		}
+	}
+}

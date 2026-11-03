@@ -1,0 +1,3 @@
+{ "tables": { "archive_test:conditional_target": {
+    "conditions": [ { "condition": "minecraft:random_chance", "chance": 1.0 } ],
+    "tomes": { "minecraft:power": 1 } } } }

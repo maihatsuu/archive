@@ -1,0 +1,14 @@
+{
+	"tables": {
+		"minecraft:chests/shipwreck_treasure": {
+			"empty_weight": 30,
+			"tomes": {
+				"minecraft:respiration": 10,
+				"minecraft:aqua_affinity": 10,
+				"minecraft:depth_strider": 5,
+				"minecraft:frost_walker": 5,
+				"minecraft:looting": 1
+			}
+		}
+	}
+}

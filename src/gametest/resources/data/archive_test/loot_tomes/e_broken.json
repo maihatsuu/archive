@@ -1,0 +1,3 @@
+{ "tables": { "archive_test:conditional_target": {
+    "conditions": [ { "condition": "minecraft:not_a_condition" } ],
+    "tomes": { "minecraft:punch": 1 } } } }

@@ -1,0 +1,14 @@
+{
+	"tables": {
+		"minecraft:chests/bastion_other": {
+			"empty_weight": 35,
+			"tomes": {
+				"archive:resilience": 5,
+				"minecraft:thorns": 5,
+				"minecraft:soul_speed": 15,
+				"minecraft:fire_aspect": 5,
+				"minecraft:flame": 5
+			}
+		}
+	}
+}

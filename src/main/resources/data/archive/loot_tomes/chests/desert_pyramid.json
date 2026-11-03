@@ -1,0 +1,15 @@
+{
+	"tables": {
+		"minecraft:chests/desert_pyramid": {
+			"empty_weight": 25,
+			"tomes": {
+				"minecraft:protection": 10,
+				"archive:resilience": 5,
+				"minecraft:thorns": 5,
+				"minecraft:feather_falling": 5,
+				"minecraft:binding_curse": 1,
+				"minecraft:vanishing_curse": 1
+			}
+		}
+	}
+}

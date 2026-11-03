@@ -1,0 +1,10 @@
+{
+	"tables": {
+		"minecraft:chests/igloo_chest": {
+			"empty_weight": 5,
+			"tomes": {
+				"minecraft:frost_walker": 10
+			}
+		}
+	}
+}

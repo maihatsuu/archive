@@ -1,0 +1,14 @@
+{
+	"tables": {
+		"minecraft:gameplay/piglin_bartering": {
+			"empty_weight": 2500,
+			"tomes": {
+				"archive:resilience": 1,
+				"minecraft:thorns": 1,
+				"minecraft:soul_speed": 20,
+				"minecraft:fire_aspect": 1,
+				"minecraft:flame": 1
+			}
+		}
+	}
+}

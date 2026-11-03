@@ -1,0 +1,23 @@
+{
+	"tables": {
+		"minecraft:gameplay/fishing/treasure": {
+			"conditions": [
+				{
+					"condition": "minecraft:location_check",
+					"predicate": {
+						"biomes": [
+							"minecraft:mushroom_fields",
+							"minecraft:lush_caves"
+						]
+					}
+				}
+			],
+			"empty_weight": 15,
+			"tomes": {
+				"minecraft:feather_falling": 1,
+				"minecraft:sweeping_edge": 1,
+				"minecraft:infinity": 1
+			}
+		}
+	}
+}

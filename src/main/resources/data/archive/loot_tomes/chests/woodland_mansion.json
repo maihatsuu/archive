@@ -1,0 +1,11 @@
+{
+	"tables": {
+		"minecraft:chests/woodland_mansion": {
+			"empty_weight": 5,
+			"tomes": {
+				"minecraft:looting": 10,
+				"minecraft:fortune": 10
+			}
+		}
+	}
+}
