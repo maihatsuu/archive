@@ -143,7 +143,7 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 		helper.assertTrue(EnchantmentHelper.getItemEnchantmentLevel(DataTests.enchant(helper, "minecraft", "vanishing_curse"), result) == 1,
 				"curse should stay");
 
-		// Default costs 5 + 10 + 15 = 30 levels; 50% of that at 50 XP/level = 750 points.
+		// Sharpness III at default costs is 10 + 10 + 10 = 30 levels; 50% of that at 50 XP/level = 750 points.
 		int refund = GrindstoneRefund.refundPoints(sword);
 		helper.assertTrue(refund == 750, "refund should be 750 points, got " + refund);
 

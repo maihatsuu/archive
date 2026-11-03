@@ -72,30 +72,30 @@ public class LibraryTableTests implements FabricGameTest {
 		shelf.setItem(1, TomeItem.of(smite));
 
 		ServerPlayer player = survivalPlayer(helper);
-		player.giveExperienceLevels(30);
+		player.giveExperienceLevels(50);
 		BlockPos tablePos = helper.absolutePos(TABLE);
 		LibraryEnchantMenu menu = new LibraryEnchantMenu(1, player.getInventory(),
 				LibraryEnchantMenu.scanEntries(helper.getLevel(), tablePos), ContainerLevelAccess.create(helper.getLevel(), tablePos));
 		helper.assertTrue(menu.getEntries().stream().filter(LibraryEntry::fromTome).count() == 2, "menu should list sharpness and smite tomes");
 		menu.getSlot(LibraryEnchantMenu.ITEM_SLOT).set(new ItemStack(Items.IRON_SWORD));
-		menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).set(new ItemStack(Items.LAPIS_LAZULI, 10));
+		menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).set(new ItemStack(Items.LAPIS_LAZULI, 30));
 
-		// Default costs: level n = 5n XP levels, n lapis.
+		// Default costs: every level is 10 XP levels and 10 lapis.
 		helper.assertTrue(menu.tryBuy(player, sharpness), "should buy sharpness I");
 		ItemStack sword = menu.getSlot(LibraryEnchantMenu.ITEM_SLOT).getItem();
 		helper.assertTrue(EnchantmentHelper.getItemEnchantmentLevel(sharpness, sword) == 1, "sword should have sharpness I");
-		helper.assertTrue(player.experienceLevel == 25, "should cost 5 levels, now " + player.experienceLevel);
-		helper.assertTrue(menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).getItem().getCount() == 9, "should cost 1 lapis");
+		helper.assertTrue(player.experienceLevel == 40, "should cost 10 levels, now " + player.experienceLevel);
+		helper.assertTrue(menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).getItem().getCount() == 20, "should cost 10 lapis");
 
 		helper.assertTrue(menu.tryBuy(player, sharpness), "should buy sharpness II");
 		helper.assertTrue(EnchantmentHelper.getItemEnchantmentLevel(sharpness, sword) == 2, "sword should have sharpness II");
-		helper.assertTrue(player.experienceLevel == 15, "should cost 10 more levels, now " + player.experienceLevel);
-		helper.assertTrue(menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).getItem().getCount() == 7, "should cost 2 more lapis");
+		helper.assertTrue(player.experienceLevel == 30, "should cost 10 more levels, now " + player.experienceLevel);
+		helper.assertTrue(menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).getItem().getCount() == 10, "should cost 10 more lapis");
 
 		helper.assertTrue(!menu.tryBuy(player, smite), "smite should be blocked by sharpness");
 
-		player.experienceLevel = 14;
-		helper.assertTrue(!menu.tryBuy(player, sharpness), "sharpness III costs 15 levels; 14 isn't enough");
+		player.experienceLevel = 9;
+		helper.assertTrue(!menu.tryBuy(player, sharpness), "sharpness III costs 10 levels; 9 isn't enough");
 		player.experienceLevel = 30;
 
 		shelf.removeItem(0, 1);
@@ -231,15 +231,15 @@ public class LibraryTableTests implements FabricGameTest {
 		LibraryEnchantMenu menu = new LibraryEnchantMenu(1, player.getInventory(),
 				LibraryEnchantMenu.scanEntries(helper.getLevel(), tablePos), ContainerLevelAccess.create(helper.getLevel(), tablePos));
 		menu.getSlot(LibraryEnchantMenu.ITEM_SLOT).set(new ItemStack(Items.IRON_SWORD));
-		menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).set(new ItemStack(Items.LAPIS_LAZULI, 10));
+		menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).set(new ItemStack(Items.LAPIS_LAZULI, 20));
 
 		helper.assertTrue(menu.tryBuy(player, sharpness), "should buy sharpness I with no bookshelves");
-		helper.assertTrue(player.experienceLevel == 25, "sharpness I costs 5 levels, now " + player.experienceLevel);
+		helper.assertTrue(player.experienceLevel == 20, "sharpness I costs 10 levels, now " + player.experienceLevel);
 		LibraryOptions.Option next = menu.options(player).stream().filter(o -> o.enchant().equals(sharpness)).findFirst().orElseThrow();
 		helper.assertTrue(next.state() == LibraryOptions.State.LOCKED, "sharpness II should be locked, got " + next.state());
 		helper.assertTrue(!menu.tryBuy(player, sharpness), "sharpness II needs bookshelves");
-		helper.assertTrue(player.experienceLevel == 25, "a refused buy shouldn't cost XP");
-		helper.assertTrue(menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).getItem().getCount() == 9, "a refused buy shouldn't cost lapis");
+		helper.assertTrue(player.experienceLevel == 20, "a refused buy shouldn't cost XP");
+		helper.assertTrue(menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).getItem().getCount() == 10, "a refused buy shouldn't cost lapis");
 
 		placeBookshelves(helper, 5, Blocks.BOOKSHELF);
 		helper.assertTrue(menu.tryBuy(player, sharpness), "5 bookshelves placed after opening: sharpness II should now buy");

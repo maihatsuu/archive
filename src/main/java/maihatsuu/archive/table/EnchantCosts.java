@@ -58,9 +58,9 @@ public final class EnchantCosts {
 		return shelfMax.keySet();
 	}
 
-	/** Placeholder formula until the cost table is filled in. */
+	/** Every level of every enchant costs 10 XP levels and 10 lapis, unless a cost file says otherwise. */
 	public static LevelCost defaultCost(int level) {
-		return new LevelCost(5 * level, level);
+		return new LevelCost(10, 10);
 	}
 
 	/** Cost of buying {@code level} (1-based) of the given enchant. */

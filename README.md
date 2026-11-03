@@ -3,7 +3,7 @@
 An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the client and the server.
 
 - **Tomes replace enchanted books.** A tome holds one enchant, with no level, shown under its name (light blue, or red for curses). Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it, or put it on a lectern to read it there. Curse tomes exist too (their enchant line is red) and let you put curses on gear on purpose, e.g. for minigames.
-- **Library enchanting table.** The table lists every shelved enchant that fits the item and sells it one level at a time for a fixed XP + lapis cost, with no randomness. Conflicting enchants are blocked; use the grindstone first.
+- **Library enchanting table.** The table lists every shelved enchant that fits the item and sells it one level at a time for a fixed cost (10 XP levels and 10 lapis per level by default), with no randomness. Conflicting enchants are blocked; use the grindstone first.
 - **Bookshelves unlock low levels.** Without a tome, plain bookshelves around the table unlock common enchants up to a per-enchant limit: level I with the table alone, II with 5 bookshelves, III with 10. Higher levels need a tome. Chiseled bookshelves don't count.
 - **Shelf particles.** Enchant particles float to the table from every bookshelf and chiseled bookshelf within range (a 9×9×9 cube by default), so you can see which shelves count.
 - **Removed enchants.** Mending, Unbreaking, and Fire/Blast/Projectile Protection can no longer be obtained, but they keep working on existing items.
@@ -44,7 +44,7 @@ The enchantment and tag changes are data, not code. They're always on, and a dat
 
 ## Data formats
 
-**Enchant costs:** `data/<namespace>/enchant_costs/<any>.json`. Both fields are optional. Enchants without `levels`, and levels past the end of the list, use `5 × level` XP levels and `level` lapis. `shelf_max` is the highest level plain bookshelves can unlock without a tome (missing or `0`: tome only, capped by the number of `shelfSteps`). Archive ships `shelf_max` files in `data/archive/enchant_costs/`. Several files may name the same enchant: they're applied in file id order, and each field a later file sets replaces the earlier value, so a pack can add costs without losing Archive's `shelf_max`.
+**Enchant costs:** `data/<namespace>/enchant_costs/<any>.json`. Both fields are optional. Enchants without `levels`, and levels past the end of the list, cost 10 XP levels and 10 lapis per level. `shelf_max` is the highest level plain bookshelves can unlock without a tome (missing or `0`: tome only, capped by the number of `shelfSteps`). Archive ships `shelf_max` files in `data/archive/enchant_costs/`. Several files may name the same enchant: they're applied in file id order, and each field a later file sets replaces the earlier value, so a pack can add costs without losing Archive's `shelf_max`.
 ```json
 { "enchantment": "minecraft:sharpness",
   "shelf_max": 2,
