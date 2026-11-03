@@ -3,8 +3,11 @@ package maihatsuu.archive.test;
 import maihatsuu.archive.table.GrindstoneRefund;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
@@ -62,6 +65,17 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 		helper.assertTrue(anvil(player, damaged(new ItemStack(Items.TRIDENT), 100), new ItemStack(Items.BREEZE_ROD))
 				.getSlot(2).getItem().isEmpty(), "a breeze rod shouldn't repair a trident");
 		player.discard();
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void grindstoneIsTitledDisenchant(GameTestHelper helper) {
+		BlockPos pos = new BlockPos(1, 1, 1);
+		helper.setBlock(pos, Blocks.GRINDSTONE);
+		BlockPos absolute = helper.absolutePos(pos);
+		Component title = helper.getLevel().getBlockState(absolute).getMenuProvider(helper.getLevel(), absolute).getDisplayName();
+		helper.assertTrue(title.getContents() instanceof TranslatableContents contents && contents.getKey().equals("container.archive.disenchant"),
+				"grindstone title should be Disenchant, got " + title);
 		helper.succeed();
 	}
 

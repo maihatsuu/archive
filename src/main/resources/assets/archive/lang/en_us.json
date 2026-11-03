@@ -1,5 +1,6 @@
 {
 	"enchantment.archive.resilience": "Resilience",
+	"container.archive.disenchant": "Disenchant",
 	"item.archive.tome": "Tome",
 	"item.archive.tome.named": "Tome of %s",
 	"archive.tome.max_level": "Max level: %s",

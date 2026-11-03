@@ -12,6 +12,7 @@
 		"anvil.AnvilBlockMixin",
 		"anvil.AnvilMenuMixin",
 		"anvil.RepairItemRecipeMixin",
+		"grindstone.GrindstoneBlockMixin",
 		"grindstone.GrindstoneMenuMixin",
 		"loot.AbstractVillagerMixin",
 		"loot.LootTableMixin",
