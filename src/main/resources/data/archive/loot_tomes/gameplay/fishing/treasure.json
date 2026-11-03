@@ -1,15 +1,15 @@
 {
 	"tables": {
 		"minecraft:gameplay/fishing/treasure": {
-			"empty_weight": 80,
+			"empty_weight": 45,
 			"tomes": {
 				"minecraft:respiration": 1,
 				"minecraft:aqua_affinity": 1,
 				"minecraft:depth_strider": 1,
 				"minecraft:luck_of_the_sea": 1,
 				"minecraft:lure": 1,
-				"minecraft:binding_curse": 5,
-				"minecraft:vanishing_curse": 5
+				"minecraft:binding_curse": 2,
+				"minecraft:vanishing_curse": 2
 			}
 		}
 	}
