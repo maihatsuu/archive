@@ -4,6 +4,7 @@ import maihatsuu.archive.registry.ModComponents;
 import maihatsuu.archive.registry.ModItems;
 import maihatsuu.archive.tome.TomeItem;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -12,6 +13,8 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+
+import java.util.List;
 
 /** Phase 5: the tome item. */
 public class TomeTests implements FabricGameTest {
@@ -54,7 +57,9 @@ public class TomeTests implements FabricGameTest {
 			}
 		}
 		helper.assertTrue(anvilShown, "the normal anvil should still be in creative");
-		helper.assertTrue(ModItems.TAB.getDisplayItems().stream().anyMatch(stack -> stack.is(ModItems.TOME)), "archive tab should list tomes");
+		List<ItemStack> ingredients = List.copyOf(BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(CreativeModeTabs.INGREDIENTS).getDisplayItems());
+		helper.assertTrue(ingredients.stream().anyMatch(stack -> stack.is(ModItems.TOME)), "ingredients tab should list tomes");
+		helper.assertTrue(ingredients.get(ingredients.size() - 1).is(ModItems.TOME), "tomes should be at the end of ingredients");
 		helper.succeed();
 	}
 }

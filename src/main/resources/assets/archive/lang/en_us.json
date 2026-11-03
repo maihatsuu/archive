@@ -2,7 +2,6 @@
 	"enchantment.archive.resilience": "Resilience",
 	"item.archive.tome": "Tome",
 	"item.archive.tome.named": "Tome of %s",
-	"itemGroup.archive": "Archive",
 	"archive.tome.max_level": "Max level: %s",
 	"archive.tome.applies_to": "Applies to:",
 	"archive.tome.no_description": "An enchantment whose purpose is not recorded in the Archive.",
