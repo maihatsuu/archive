@@ -203,7 +203,7 @@ public class LibraryTableTests implements FabricGameTest {
 		helper.assertTrue(EnchantCosts.cost(efficiency, 3).equals(EnchantCosts.defaultCost(3)), "efficiency III falls back to default");
 		helper.assertTrue(EnchantCosts.allLevels(efficiency).size() == 5, "efficiency has 5 levels");
 		// archive's efficiency file sets shelf_max; archive_test's sets levels. Both apply.
-		helper.assertTrue(EnchantCosts.shelfMax(efficiency) == 2, "efficiency shelf_max from archive's file");
+		helper.assertTrue(EnchantCosts.shelfMax(efficiency) == 3, "efficiency shelf_max from archive's file");
 		helper.succeed();
 	}
 
@@ -227,12 +227,13 @@ public class LibraryTableTests implements FabricGameTest {
 	}
 
 	private static void placeBookshelves(GameTestHelper helper, int count, Block block) {
+		// Rows of 5 along z = 4, stacked upwards, all within the table's 4-block range.
 		for (int i = 0; i < count; i++) {
-			helper.setBlock(new BlockPos(i, 1, 4), block);
+			helper.setBlock(new BlockPos(i % 5, 1 + i / 5, 4), block);
 		}
 	}
 
-	/** Starter data: sharpness shelf_max 2, smite 3. Default shelfSteps {0, 5, 10}. */
+	/** Starter data: sharpness shelf_max 3; the test pack gives knockback shelf_max 1. Default shelfSteps {0, 5, 10}. */
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void tableAloneUnlocksLevelOne(GameTestHelper helper) {
 		helper.setBlock(TABLE, Blocks.ENCHANTING_TABLE);
@@ -249,10 +250,12 @@ public class LibraryTableTests implements FabricGameTest {
 		helper.setBlock(TABLE, Blocks.ENCHANTING_TABLE);
 		placeBookshelves(helper, 5, Blocks.BOOKSHELF);
 		LibraryEntry sharpness = entry(helper, "sharpness");
-		helper.assertTrue(sharpness.unlockedMax() == 2, "5 shelves: sharpness II, got " + sharpness.unlockedMax());
-		helper.assertTrue(sharpness.shelvesForNext() == 0, "sharpness III needs a tome");
-		LibraryEntry smite = entry(helper, "smite");
-		helper.assertTrue(smite.unlockedMax() == 2 && smite.shelvesForNext() == 10, "5 shelves: smite II, III at 10, got " + smite);
+		helper.assertTrue(sharpness.unlockedMax() == 2 && sharpness.shelvesForNext() == 10, "5 shelves: sharpness II, III at 10, got " + sharpness);
+		LibraryEntry knockback = entry(helper, "knockback");
+		helper.assertTrue(knockback.unlockedMax() == 1 && knockback.shelvesForNext() == 0, "knockback stops at its shelf_max of I, got " + knockback);
+		placeBookshelves(helper, 10, Blocks.BOOKSHELF);
+		LibraryEntry sharpness10 = entry(helper, "sharpness");
+		helper.assertTrue(sharpness10.unlockedMax() == 3 && sharpness10.shelvesForNext() == 0, "10 shelves: sharpness III, IV needs a tome, got " + sharpness10);
 		helper.succeed();
 	}
 
