@@ -5,6 +5,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 - **Tomes replace enchanted books.** A tome holds one enchant, with no level. Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it.
 - **Library enchanting table.** The table lists every shelved enchant that fits the item and sells it one level at a time for a fixed XP + lapis cost, with no randomness. Conflicting enchants are blocked; use the grindstone first.
 - **Bookshelves unlock low levels.** Without a tome, plain bookshelves around the table unlock common enchants up to a per-enchant limit: level I with the table alone, II with 5 bookshelves, III with 10. Higher levels need a tome. Chiseled bookshelves don't count.
+- **Shelf particles.** Enchant particles float to the table from every bookshelf and chiseled bookshelf within range (a 9×9×9 cube by default), so you can see which shelves count.
 - **Removed enchants.** Mending, Unbreaking, and Fire/Blast/Projectile Protection can no longer be obtained, but they keep working on existing items.
 - **Changed enchants.**
   - Protection maxes at III.
@@ -29,14 +30,14 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 |---|---|---|
 | `xpCurve`, `durability`, `mining`, `anvil`, `grindstone`, `libraryTable`, `stripBookLoot` | `true` | Toggle each subsystem |
 | `xpPerLevel` / `levelCap` / `deathXpFraction` | `50` / `100` / `0.5` | XP curve |
-| `tableRadius` | `6` | Bookshelf scan radius around the table |
+| `tableRadius` | `4` | How far the table looks for bookshelves: a cube this many blocks out, so 4 = 9×9×9 |
 | `shelfSteps` | `[0, 5, 10]` | Plain bookshelves needed for each level unlocked without a tome |
 | `grindstoneRefundFraction` | `0.5` | Share of the table cost refunded by the grindstone |
 | `diamondSpeed` / `netheriteSpeed` | `12` / `19` | Tool mining speed (restart needed) |
 | `deepslateHardness` / `deepslateOreHardness` / `obsidianHardness` | `2.0` / `3.5` / `20.0` | Block hardness |
 | `durabilityOverrides` | `{}` | Item id → max durability, e.g. `{"minecraft:iron_pickaxe": 500}` (restart needed) |
 
-Client and server should use the same XP, mining and hardness values, or the client will predict them wrong.
+Client and server should use the same XP, mining, hardness and `tableRadius` values, or the client will predict them wrong (the client draws the bookshelf particles from its own `tableRadius`).
 
 The enchantment and tag changes are data, not code. They're always on, and a datapack can override them.
 

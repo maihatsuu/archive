@@ -49,12 +49,16 @@ public class LibraryTableTests implements FabricGameTest {
 		near.setItem(1, TomeItem.of(DataTests.enchant(helper, "minecraft", "sharpness")));
 		near.setItem(2, TomeItem.of(DataTests.enchant(helper, "minecraft", "mending")));
 		near.setItem(3, new ItemStack(Items.BOOK));
-		ChiseledBookShelfBlockEntity far = shelf(helper, TABLE.offset(9, 0, 0));
+		// 9x9x9 range: 4 blocks out is in, 5 is out.
+		ChiseledBookShelfBlockEntity edge = shelf(helper, TABLE.offset(0, 4, 0));
+		edge.setItem(0, TomeItem.of(DataTests.enchant(helper, "minecraft", "efficiency")));
+		ChiseledBookShelfBlockEntity far = shelf(helper, TABLE.offset(0, 5, 0));
 		far.setItem(0, TomeItem.of(DataTests.enchant(helper, "minecraft", "smite")));
 
-		List<Holder<Enchantment>> found = LibraryScan.scan(helper.getLevel(), helper.absolutePos(TABLE), 6).tomes();
-		helper.assertTrue(found.size() == 1, "should find exactly sharpness, found " + found.size());
-		helper.assertTrue(found.get(0).equals(DataTests.enchant(helper, "minecraft", "sharpness")), "should find sharpness");
+		List<Holder<Enchantment>> found = LibraryScan.scan(helper.getLevel(), helper.absolutePos(TABLE), 4).tomes();
+		helper.assertTrue(found.size() == 2, "should find sharpness and efficiency, found " + found.size());
+		helper.assertTrue(found.contains(DataTests.enchant(helper, "minecraft", "sharpness")), "should find sharpness");
+		helper.assertTrue(found.contains(DataTests.enchant(helper, "minecraft", "efficiency")), "should find the tome 4 blocks out");
 		helper.succeed();
 	}
 
