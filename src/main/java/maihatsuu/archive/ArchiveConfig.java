@@ -42,6 +42,8 @@ public final class ArchiveConfig {
 	public int tableRadius = 4;
 	/** Plain bookshelves needed for each level unlocked without a tome: {0, 5, 10} = I with none, II at 5, III at 10. */
 	public int[] shelfSteps = {0, 5, 10};
+	/** Show every enchant that fits the item, with locked rows and hints; false shows only what can be enchanted now. Display only. */
+	public boolean tableShowLocked = true;
 
 	// Mining
 	public float diamondSpeed = 12.0F;

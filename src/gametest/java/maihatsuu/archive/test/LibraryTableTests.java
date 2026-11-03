@@ -1,5 +1,6 @@
 package maihatsuu.archive.test;
 
+import maihatsuu.archive.ArchiveConfig;
 import maihatsuu.archive.table.EnchantCosts;
 import maihatsuu.archive.table.LibraryEnchantMenu;
 import maihatsuu.archive.table.LibraryEntry;
@@ -141,6 +142,57 @@ public class LibraryTableTests implements FabricGameTest {
 				menu.getSlot(LibraryEnchantMenu.ITEM_SLOT).getItem()) == 1, "sword should have curse of vanishing");
 		player.discard();
 		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void listsEveryFittingEnchantWithHints(GameTestHelper helper) {
+		helper.setBlock(TABLE, Blocks.ENCHANTING_TABLE);
+		ServerPlayer player = survivalPlayer(helper);
+		player.giveExperienceLevels(30);
+		BlockPos tablePos = helper.absolutePos(TABLE);
+		Holder<Enchantment> efficiency = DataTests.enchant(helper, "minecraft", "efficiency");
+		Holder<Enchantment> silkTouch = DataTests.enchant(helper, "minecraft", "silk_touch");
+		Holder<Enchantment> vanishing = DataTests.enchant(helper, "minecraft", "vanishing_curse");
+		Holder<Enchantment> sharpness = DataTests.enchant(helper, "minecraft", "sharpness");
+		boolean showLocked = ArchiveConfig.get().tableShowLocked;
+		try {
+			ArchiveConfig.get().tableShowLocked = true;
+			LibraryEnchantMenu menu = new LibraryEnchantMenu(1, player.getInventory(),
+					LibraryEnchantMenu.scanEntries(helper.getLevel(), tablePos), ContainerLevelAccess.create(helper.getLevel(), tablePos));
+			menu.getSlot(LibraryEnchantMenu.ITEM_SLOT).set(new ItemStack(Items.IRON_PICKAXE));
+			menu.getSlot(LibraryEnchantMenu.LAPIS_SLOT).set(new ItemStack(Items.LAPIS_LAZULI, 30));
+			List<LibraryOptions.Option> options = menu.options(player);
+			helper.assertTrue(state(options, efficiency) == LibraryOptions.State.AVAILABLE, "efficiency I should be available from the table alone");
+			helper.assertTrue(state(options, silkTouch) == LibraryOptions.State.LOCKED, "silk touch should show as locked without a tome");
+			helper.assertTrue(state(options, sharpness) == null, "sharpness doesn't fit a pickaxe");
+			helper.assertTrue(state(options, vanishing) == null, "curses aren't listed as hints");
+			int lastAvailable = -1;
+			int firstLocked = options.size();
+			for (int i = 0; i < options.size(); i++) {
+				if (options.get(i).state() == LibraryOptions.State.AVAILABLE) lastAvailable = i;
+				if (options.get(i).state() == LibraryOptions.State.LOCKED) firstLocked = Math.min(firstLocked, i);
+			}
+			helper.assertTrue(lastAvailable < firstLocked, "available rows should come before locked ones");
+
+			shelf(helper, SHELF).setItem(0, TomeItem.of(vanishing));
+			LibraryEnchantMenu withCurse = new LibraryEnchantMenu(1, player.getInventory(),
+					LibraryEnchantMenu.scanEntries(helper.getLevel(), tablePos), ContainerLevelAccess.create(helper.getLevel(), tablePos));
+			withCurse.getSlot(LibraryEnchantMenu.ITEM_SLOT).set(new ItemStack(Items.IRON_PICKAXE));
+			helper.assertTrue(state(withCurse.options(player), vanishing) != null, "a shelved curse tome should be listed");
+
+			ArchiveConfig.get().tableShowLocked = false;
+			List<LibraryOptions.Option> current = menu.options(player);
+			helper.assertTrue(current.stream().noneMatch(o -> o.state() == LibraryOptions.State.LOCKED), "no locked rows with tableShowLocked off");
+			helper.assertTrue(state(current, efficiency) == LibraryOptions.State.AVAILABLE, "efficiency I should still be listed");
+		} finally {
+			ArchiveConfig.get().tableShowLocked = showLocked;
+		}
+		player.discard();
+		helper.succeed();
+	}
+
+	private static LibraryOptions.State state(List<LibraryOptions.Option> options, Holder<Enchantment> enchant) {
+		return options.stream().filter(o -> o.enchant().equals(enchant)).map(LibraryOptions.Option::state).findFirst().orElse(null);
 	}
 
 	@GameTest(template = EMPTY_STRUCTURE)

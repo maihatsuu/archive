@@ -1,15 +1,19 @@
 package maihatsuu.archive.table;
 
 import com.mojang.datafixers.util.Pair;
+import maihatsuu.archive.ArchiveConfig;
+import maihatsuu.archive.registry.ModItems;
 import maihatsuu.archive.registry.ModMenus;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,6 +29,8 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,12 +103,33 @@ public class LibraryEnchantMenu extends AbstractContainerMenu {
 		return this.entries;
 	}
 
+	/**
+	 * What the screen lists for the item in the slot, buyable first. With {@code tableShowLocked} on, every
+	 * enchant that fits the item is listed (non-curse enchants the table doesn't offer show as locked, as
+	 * hints); off, locked rows are hidden. Display only: {@link #tryBuy} checks everything again.
+	 */
 	public List<LibraryOptions.Option> options(Player player) {
-		List<Holder<Enchantment>> available = this.entries.stream().map(LibraryEntry::enchant).toList();
-		return LibraryOptions.compute(available, this.getSlot(ITEM_SLOT).getItem(), player, this.getSlot(LAPIS_SLOT).getItem().getCount(),
+		boolean showLocked = ArchiveConfig.get().tableShowLocked;
+		List<Holder<Enchantment>> candidates = new ArrayList<>(this.entries.stream().map(LibraryEntry::enchant).toList());
+		if (showLocked) {
+			player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).listElements()
+					.filter(enchant -> ModItems.isTomeEnchant(enchant) && !enchant.is(EnchantmentTags.CURSE) && entry(enchant).isEmpty())
+					.forEach(candidates::add);
+		}
+		List<LibraryOptions.Option> options = new ArrayList<>(LibraryOptions.compute(candidates, this.getSlot(ITEM_SLOT).getItem(), player,
+				this.getSlot(LAPIS_SLOT).getItem().getCount(),
 				(enchant, level) -> entry(enchant).map(entry -> entry.cost(level)).orElseGet(() -> EnchantCosts.cost(enchant, level)),
-				enchant -> entry(enchant).map(LibraryEntry::unlockedMax).orElse(0));
+				enchant -> entry(enchant).map(LibraryEntry::unlockedMax).orElse(0)));
+		if (!showLocked) {
+			options.removeIf(option -> option.state() == LibraryOptions.State.LOCKED);
+		}
+		options.sort(Comparator.comparingInt((LibraryOptions.Option option) -> DISPLAY_ORDER.indexOf(option.state()))
+				.thenComparing(option -> option.enchant().value().description().getString()));
+		return options;
 	}
+
+	private static final List<LibraryOptions.State> DISPLAY_ORDER = List.of(LibraryOptions.State.AVAILABLE,
+			LibraryOptions.State.TOO_EXPENSIVE, LibraryOptions.State.INCOMPATIBLE, LibraryOptions.State.LOCKED, LibraryOptions.State.MAXED);
 
 	/**
 	 * Server: buy the next level of {@code enchant}. Everything is re-checked against the world:

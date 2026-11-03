@@ -51,7 +51,6 @@
 	"archive.table.max": "Max",
 	"archive.table.locked": "Locked",
 	"archive.table.place_item": "Place an item to enchant",
-	"archive.table.no_tomes": "No tomes shelved nearby",
 	"archive.table.nothing_fits": "Nothing here fits this item",
 	"archive.table.tooltip.cost": "Cost: %s levels, %s lapis",
 	"archive.table.tooltip.too_expensive": "Not enough levels or lapis",

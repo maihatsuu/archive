@@ -3,7 +3,7 @@
 An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the client and the server.
 
 - **Tomes replace enchanted books.** A tome holds one enchant, with no level, shown under its name (light blue, or red for curses). Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it, or put it on a lectern to read it there. Curse tomes exist too (their enchant line is red) and let you put curses on gear on purpose, e.g. for minigames.
-- **Library enchanting table.** The table lists every shelved enchant that fits the item and sells it one level at a time for a fixed cost (10 XP levels and 10 lapis per level by default), with no randomness. Conflicting enchants are blocked; use the grindstone first.
+- **Library enchanting table.** The table lists every enchant that fits the item and sells the ones it offers (shelved tomes, plus low levels unlocked by bookshelves) one level at a time for a fixed cost (10 XP levels and 10 lapis per level by default), with no randomness. Ones you can't get yet show as locked, with a hint ("Needs a tome" / "Needs 5 bookshelves nearby"); curses only show when a curse tome is shelved. Conflicting enchants are blocked; use the grindstone first.
 - **Bookshelves unlock low levels.** Without a tome, plain bookshelves around the table unlock common enchants up to a per-enchant limit: level I with the table alone, II with 5 bookshelves, III with 10. Higher levels need a tome. Chiseled bookshelves don't count.
 - **Shelf particles.** Enchant particles float to the table from every bookshelf and chiseled bookshelf within range (a 9×9×9 cube by default), so you can see which shelves count.
 - **Removed enchants.** Mending, Unbreaking, and Fire/Blast/Projectile Protection can no longer be obtained, but they keep working on existing items.
@@ -31,6 +31,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 |---|---|---|
 | `xpCurve`, `durability`, `mining`, `anvil`, `grindstone`, `libraryTable`, `stripBookLoot` | `true` | Toggle each subsystem |
 | `xpPerLevel` / `levelCap` / `deathXpFraction` | `50` / `100` / `0.5` | XP curve |
+| `tableShowLocked` | `true` | Table lists every enchant that fits the item, with locked rows and hints. `false` lists only what can be enchanted now. Client-side display only |
 | `tableRadius` | `4` | How far the table looks for bookshelves: a cube this many blocks out, so 4 = 9×9×9 |
 | `shelfSteps` | `[0, 5, 10]` | Plain bookshelves needed for each level unlocked without a tome |
 | `diamondSpeed` / `netheriteSpeed` | `12` / `19` | Tool mining speed (restart needed) |
