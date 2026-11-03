@@ -10,11 +10,15 @@ import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 /** Phase 4: anvil repairs/renames only and is free; grindstone only disenchants. */
 public class AnvilGrindstoneTests implements FabricGameTest {
@@ -58,6 +62,15 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 		helper.assertTrue(anvil(player, damaged(new ItemStack(Items.TRIDENT), 100), new ItemStack(Items.BREEZE_ROD))
 				.getSlot(2).getItem().isEmpty(), "a breeze rod shouldn't repair a trident");
 		player.discard();
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void craftingGridDoesntCombineItems(GameTestHelper helper) {
+		CraftingInput input = CraftingInput.of(2, 1, List.of(damaged(new ItemStack(Items.IRON_PICKAXE), 100),
+				damaged(new ItemStack(Items.IRON_PICKAXE), 100)));
+		helper.assertTrue(helper.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, helper.getLevel()).isEmpty(),
+				"two damaged pickaxes should not combine in the crafting grid");
 		helper.succeed();
 	}
 

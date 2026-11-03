@@ -11,6 +11,7 @@
 		"gear.TridentRepairMixin",
 		"anvil.AnvilBlockMixin",
 		"anvil.AnvilMenuMixin",
+		"anvil.RepairItemRecipeMixin",
 		"grindstone.GrindstoneMenuMixin",
 		"loot.AbstractVillagerMixin",
 		"loot.LootTableMixin",

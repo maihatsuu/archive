@@ -20,7 +20,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
   - Diamond mining speed is 12 and netherite is 19.
   - Deepslate blocks have hardness 2.0, and deepslate ores 3.5.
   - Obsidian, crying obsidian, respawn anchors and ender chests have hardness 20.0.
-- **Anvil** only repairs and renames, always for free, and never chips (chipped and damaged anvils are hidden from creative). One unit of the base material (e.g. 1 iron ingot) fully repairs an item.
+- **Anvil** only repairs and renames, always for free, and never chips (chipped and damaged anvils are hidden from creative). One unit of the base material (e.g. 1 iron ingot) fully repairs an item. Two damaged items can't be combined in the crafting grid either.
 - **Grindstone** only disenchants a single item and refunds part of the table cost.
 
 ## Config
