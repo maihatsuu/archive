@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Adds tome pools to loot tables, from datapack files {@code data/<namespace>/structure_tomes/<any>.json}:
+ * Adds tome pools to loot tables, from datapack files {@code data/<namespace>/loot_tomes/<any>.json}:
  * <pre>
  * { "tables": { "minecraft:chests/stronghold_library": {
  *     "empty_weight": 10,
@@ -39,11 +39,11 @@ import java.util.TreeMap;
  * Loot tables are built before reload listeners run, so the files are read by
  * {@code ReloadableServerRegistriesMixin} at the start of each reload, just before the tables are parsed.
  */
-public final class StructureTomes {
+public final class LootTomes {
 	private record TableEntry(ResourceLocation file, int emptyWeight, Map<ResourceLocation, Integer> tomes) {
 	}
 
-	private static final String DIRECTORY = "structure_tomes";
+	private static final String DIRECTORY = "loot_tomes";
 	private static final Gson GSON = new Gson();
 	private static volatile Map<ResourceLocation, List<TableEntry>> tables = Map.of();
 
@@ -62,7 +62,7 @@ public final class StructureTomes {
 				entry.tomes().forEach((id, weight) -> {
 					Holder<Enchantment> enchant = enchantments.get(ResourceKey.create(Registries.ENCHANTMENT, id)).orElse(null);
 					if (enchant == null) {
-						Archive.LOGGER.warn("structure_tomes {}: skipping unknown enchantment {} for {}", entry.file(), id, key.location());
+						Archive.LOGGER.warn("loot_tomes {}: skipping unknown enchantment {} for {}", entry.file(), id, key.location());
 						return;
 					}
 					pool.add(LootItem.lootTableItem(ModItems.TOME).setWeight(weight).apply(SetTomeFunction.builder(enchant)));
@@ -72,7 +72,7 @@ public final class StructureTomes {
 		});
 	}
 
-	/** Reads every {@code structure_tomes} file from the reloading datapacks. */
+	/** Reads every {@code loot_tomes} file from the reloading datapacks. */
 	public static void load(ResourceManager manager) {
 		Map<ResourceLocation, JsonElement> files = new HashMap<>();
 		SimpleJsonResourceReloadListener.scanDirectory(manager, DIRECTORY, GSON, files);
@@ -93,14 +93,14 @@ public final class StructureTomes {
 				}
 				fromFile.forEach((table, entry) -> parsed.computeIfAbsent(table, k -> new ArrayList<>()).add(entry));
 			} catch (Exception e) {
-				Archive.LOGGER.error("Invalid structure_tomes file {}", file, e);
+				Archive.LOGGER.error("Invalid loot_tomes file {}", file, e);
 			}
 		});
 		parsed.replaceAll((table, entries) -> List.copyOf(entries));
 		tables = Map.copyOf(parsed);
-		Archive.LOGGER.info("Loaded structure tomes for {} loot tables", parsed.size());
+		Archive.LOGGER.info("Loaded loot tomes for {} loot tables", parsed.size());
 	}
 
-	private StructureTomes() {
+	private LootTomes() {
 	}
 }

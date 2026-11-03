@@ -122,16 +122,16 @@ public class BookSourceTests implements FabricGameTest {
 		helper.succeed();
 	}
 
-	/** Each structure_tomes file adds its own pool; unknown enchants are skipped (test datapack). */
+	/** Each loot_tomes file adds its own pool; unknown enchants are skipped (test datapack). */
 	@GameTest(template = EMPTY_STRUCTURE)
-	public void structureTomesFromDatapack(GameTestHelper helper) {
+	public void lootTomesFromDatapack(GameTestHelper helper) {
 		LootTable table = helper.getLevel().getServer().reloadableRegistries().getLootTable(
 				ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath("archive_test", "tome_target")));
 		LootParams params = new LootParams.Builder(helper.getLevel()).create(LootContextParamSets.EMPTY);
 		for (int i = 0; i < 50; i++) {
 			List<String> enchants = table.getRandomItems(params).stream()
 					.map(stack -> {
-						helper.assertTrue(stack.is(ModItems.TOME), "structure tome pool produced " + stack);
+						helper.assertTrue(stack.is(ModItems.TOME), "loot tome pool produced " + stack);
 						return stack.get(ModComponents.TOME_ENCHANTMENT).getRegisteredName();
 					})
 					.sorted()

@@ -6,7 +6,7 @@ import maihatsuu.archive.registry.ModLootFunctions;
 import maihatsuu.archive.registry.ModMenus;
 import maihatsuu.archive.registry.ModNetworking;
 import maihatsuu.archive.table.EnchantCosts;
-import maihatsuu.archive.tome.StructureTomes;
+import maihatsuu.archive.tome.LootTomes;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.packs.PackType;
 import net.fabricmc.api.ModInitializer;
@@ -26,7 +26,7 @@ public class Archive implements ModInitializer {
 		ModComponents.init();
 		ModItems.init();
 		ModLootFunctions.init();
-		StructureTomes.register();
+		LootTomes.register();
 		ModMenus.init();
 		ModNetworking.init();
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new EnchantCosts.ReloadListener());
