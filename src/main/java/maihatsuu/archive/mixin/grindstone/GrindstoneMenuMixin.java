@@ -17,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,6 +35,11 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
 
 	@Shadow
 	protected abstract ItemStack removeNonCursesFrom(ItemStack stack);
+
+	@Unique
+	private static final int INPUT_X = 49;
+	@Unique
+	private static final int INPUT_Y = 30;
 
 	private GrindstoneMenuMixin(MenuType<?> type, int id) {
 		super(type, id);
@@ -86,5 +92,38 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu {
 		};
 		replacement.index = vanilla.index;
 		this.slots.set(2, replacement);
+		archive$useSingleInputSlot();
+	}
+
+	/**
+	 * One input slot, where Archive's grindstone texture draws it ({@link #INPUT_X}, {@link #INPUT_Y}).
+	 * The bottom slot stays in the list, since slot indexes are fixed, but can't be seen or filled.
+	 */
+	@Unique
+	private void archive$useSingleInputSlot() {
+		Slot top = this.slots.get(0);
+		Slot input = new Slot(this.repairSlots, 0, INPUT_X, INPUT_Y) {
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return top.mayPlace(stack);
+			}
+		};
+		input.index = top.index;
+		this.slots.set(0, input);
+
+		Slot bottom = this.slots.get(1);
+		Slot hidden = new Slot(this.repairSlots, 1, bottom.x, bottom.y) {
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return false;
+			}
+
+			@Override
+			public boolean isActive() {
+				return false;
+			}
+		};
+		hidden.index = bottom.index;
+		this.slots.set(1, hidden);
 	}
 }

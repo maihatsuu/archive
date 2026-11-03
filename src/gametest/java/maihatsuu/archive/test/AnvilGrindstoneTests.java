@@ -150,6 +150,17 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 		menu.getSlot(1).set(new ItemStack(Items.IRON_SWORD));
 		helper.assertTrue(menu.getSlot(2).getItem().isEmpty(), "two items should give no result");
 
+		// One input slot: at the texture's spot, and the old bottom slot can't be seen or filled.
+		GrindstoneMenu layout = new GrindstoneMenu(0, player.getInventory(), ContainerLevelAccess.NULL);
+		helper.assertTrue(layout.getSlot(0).x == 49 && layout.getSlot(0).y == 30, "input slot should be at 49,30");
+		helper.assertTrue(!layout.getSlot(1).isActive() && !layout.getSlot(1).mayPlace(sword), "bottom slot should be disabled");
+		layout.getSlot(0).set(sword.copy());
+		ItemStack second = sword.copy();
+		player.getInventory().setItem(0, second);
+		layout.quickMoveStack(player, 30);
+		helper.assertTrue(layout.getSlot(1).getItem().isEmpty(), "shift-click shouldn't fill the hidden slot");
+		player.getInventory().setItem(0, ItemStack.EMPTY);
+
 		GrindstoneMenu cursedOnly = new GrindstoneMenu(0, player.getInventory(), ContainerLevelAccess.NULL);
 		ItemStack cursed = new ItemStack(Items.IRON_SWORD);
 		EnchantmentHelper.updateEnchantments(cursed, m -> m.set(DataTests.enchant(helper, "minecraft", "vanishing_curse"), 1));
