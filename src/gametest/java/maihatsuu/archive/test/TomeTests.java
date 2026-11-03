@@ -3,10 +3,12 @@ package maihatsuu.archive.test;
 import maihatsuu.archive.registry.ModComponents;
 import maihatsuu.archive.registry.ModItems;
 import maihatsuu.archive.tome.TomeItem;
+import net.minecraft.ChatFormatting;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.CreativeModeTab;
@@ -26,11 +28,15 @@ public class TomeTests implements FabricGameTest {
 		helper.assertTrue(!tome.hasFoil(), "tome should have no glint");
 		helper.assertTrue(tome.getMaxStackSize() == 1, "tomes should not stack");
 		helper.assertTrue(tome.getHoverName().getContents() instanceof TranslatableContents contents
-				&& contents.getKey().equals("item.archive.tome.named"), "tome name should be 'Tome of ...'");
+				&& contents.getKey().equals("item.archive.tome"), "tome name should be just 'Tome'");
+		helper.assertTrue(TomeItem.enchantLine(DataTests.enchant(helper, "minecraft", "sharpness")).getStyle().getColor()
+				.equals(TextColor.fromLegacyFormat(ChatFormatting.AQUA)), "enchant line should be light blue");
 		helper.assertTrue(tome.is(ItemTags.BOOKSHELF_BOOKS), "tome should fit in chiseled bookshelves");
 		ItemStack cursed = TomeItem.of(DataTests.enchant(helper, "minecraft", "binding_curse"));
 		helper.assertTrue(cursed.getHoverName().getContents() instanceof TranslatableContents contents
-				&& contents.getKey().equals("item.archive.tome.cursed"), "curse tome name should be 'Cursed Tome of ...'");
+				&& contents.getKey().equals("item.archive.tome"), "curse tome name should be just 'Tome'");
+		helper.assertTrue(TomeItem.enchantLine(DataTests.enchant(helper, "minecraft", "binding_curse")).getStyle().getColor()
+				.equals(TextColor.fromLegacyFormat(ChatFormatting.RED)), "curse line should be red");
 		helper.succeed();
 	}
 

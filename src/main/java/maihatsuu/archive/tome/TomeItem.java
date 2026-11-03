@@ -2,6 +2,7 @@ package maihatsuu.archive.tome;
 
 import maihatsuu.archive.registry.ModComponents;
 import maihatsuu.archive.registry.ModItems;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.EnchantmentTags;
@@ -10,10 +11,12 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -45,22 +48,18 @@ public class TomeItem extends Item {
 		return false;
 	}
 
+	/** The enchant as a tooltip line: light blue, or red for curses. */
+	public static Component enchantLine(Holder<Enchantment> enchant) {
+		return enchant.value().description().copy()
+				.withStyle(enchant.is(EnchantmentTags.CURSE) ? ChatFormatting.RED : ChatFormatting.AQUA);
+	}
+
 	@Override
-	public Component getName(ItemStack stack) {
+	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
 		Holder<Enchantment> enchant = getEnchant(stack);
-		if (enchant == null) {
-			return super.getName(stack);
+		if (enchant != null) {
+			tooltip.add(enchantLine(enchant));
 		}
-		if (enchant.is(EnchantmentTags.CURSE)) {
-			// "Cursed Tome of Binding" rather than "Tome of Curse of Binding". The short name comes from
-			// the lang key enchantment.<namespace>.<path>.cursed_tome; curses without one use their full name.
-			String key = enchant.unwrapKey()
-					.map(k -> "enchantment." + k.location().getNamespace() + "." + k.location().getPath() + ".cursed_tome")
-					.orElse("");
-			return Component.translatable("item.archive.tome.cursed",
-					Component.translatableWithFallback(key, enchant.value().description().getString()));
-		}
-		return Component.translatable("item.archive.tome.named", enchant.value().description());
 	}
 
 	@Override
