@@ -62,8 +62,25 @@ public final class ArchiveConfig {
 		return instance;
 	}
 
+	private static Path path() {
+		return FabricLoader.getInstance().getConfigDir().resolve(Archive.MOD_ID + ".json");
+	}
+
+	/** Writes the current config to disk (used by the config screen). */
+	public void save() {
+		Path path = path();
+		try {
+			Files.createDirectories(path.getParent());
+			try (Writer writer = Files.newBufferedWriter(path)) {
+				GSON.toJson(this, writer);
+			}
+		} catch (IOException e) {
+			Archive.LOGGER.error("Failed to write {}", path, e);
+		}
+	}
+
 	private static ArchiveConfig load() {
-		Path path = FabricLoader.getInstance().getConfigDir().resolve(Archive.MOD_ID + ".json");
+		Path path = path();
 		ArchiveConfig config = null;
 		if (Files.exists(path)) {
 			try (Reader reader = Files.newBufferedReader(path)) {
@@ -78,14 +95,7 @@ public final class ArchiveConfig {
 			config = new ArchiveConfig();
 		}
 		// Write back so new keys appear with their defaults.
-		try {
-			Files.createDirectories(path.getParent());
-			try (Writer writer = Files.newBufferedWriter(path)) {
-				GSON.toJson(config, writer);
-			}
-		} catch (IOException e) {
-			Archive.LOGGER.error("Failed to write {}", path, e);
-		}
+		config.save();
 		return config;
 	}
 }

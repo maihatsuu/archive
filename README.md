@@ -26,7 +26,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 
 ## Config
 
-`config/archive.json` is created on first launch.
+`config/archive.json` is created on first launch. With [Mod Menu](https://modrinth.com/mod/modmenu) installed, everything except `durabilityOverrides` can also be edited in game (Mods → Archive → Config). Archive requires [Cloth Config](https://modrinth.com/mod/cloth-config) for that screen.
 
 | Key | Default | |
 |---|---|---|
