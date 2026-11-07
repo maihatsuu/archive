@@ -2,7 +2,7 @@
 
 An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the client and the server.
 
-- **Tomes replace enchanted books.** A tome holds one enchant, with no level, shown under its name (light blue, or red for curses). Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up. Right-click a tome to read it (its description, which enchants it's incompatible with, and what it applies to), or put it on a lectern to read it there. Curse tomes exist too (their enchant line is red) and let you put curses on gear on purpose, e.g. for minigames.
+- **Tomes replace enchanted books.** A tome holds one enchant, with no level, shown under its name (light blue, or red for curses). Shelve tomes in chiseled bookshelves near an enchanting table to unlock them. Tomes are never used up, and tomes of the same enchant stack to 16. Right-click a tome to read it (its description, which enchants it's incompatible with, and what it applies to), or put it on a lectern to read it there. Curse tomes exist too (their enchant line is red) and let you put curses on gear on purpose, e.g. for minigames.
 - **Library enchanting table.** The table lists every enchant that fits the item and sells the ones it offers (shelved tomes, plus low levels unlocked by bookshelves) one level at a time for a fixed cost (10 XP levels and 10 lapis per level by default), with no randomness. Ones you can't get yet show as locked, with a hint ("Needs a tome" / "Needs 5 bookshelves nearby"); curses only show when a curse tome is shelved. Conflicting enchants are blocked; use the grindstone first.
 - **Bookshelves unlock low levels.** Without a tome, plain bookshelves around the table unlock up to level III of Sharpness, Smite, Bane of Arthropods, Efficiency, Power and Impaling, and level I of Protection, Resilience, Feather Falling, Respiration, Fortune, Looting, Sweeping Edge, Luck of the Sea, Lure and Quick Charge: level I with the table alone, II with 5 bookshelves, III with 10. Higher levels need a tome. Chiseled bookshelves don't count.
 - **Shelf particles.** Enchant particles float to the table from every bookshelf and chiseled bookshelf within range (a 9×9×9 cube by default), so you can see which shelves count.
@@ -13,6 +13,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
   - Depth Strider moves to leggings.
   - New **Resilience** (chestplate, max III): reduces fire, explosion and projectile damage, burn time and knockback. It stacks with Protection.
 - **No vanilla enchanted books** from loot chests, fishing, bartering, hero-of-the-village gifts or villager trades.
+- **Stronghold library shelves.** Stronghold libraries no longer have chests. Instead each newly generated library has 12–24 chiseled bookshelves holding up to six books in random slots, and each book has a 20% chance to be a tome.
 - **Flat XP curve.** Every level costs 50 XP, levels cap at 100, a Bottle o' Enchanting gives one level, and you drop 50% of your XP on death.
 - **Gear.**
   - Netherite gear is unbreakable.
@@ -32,6 +33,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 | Key | Default | |
 |---|---|---|
 | `xpCurve`, `durability`, `mining`, `anvil`, `grindstone`, `libraryTable`, `stripBookLoot` | `true` | Toggle each subsystem |
+| `strongholdShelves` | `true` | Stronghold libraries get chiseled bookshelves with books and tomes instead of chests (only affects newly generated chunks) |
 | `xpPerLevel` / `levelCap` / `deathXpFraction` | `50` / `100` / `0.5` | XP curve |
 | `tableShowLocked` | `true` | Table lists every enchant that fits the item, with locked rows and hints. `false` lists only what can be enchanted now. Client-side display only |
 | `tableRadius` | `4` | How far the table looks for bookshelves: a cube this many blocks out, so 4 = 9×9×9 |
@@ -69,6 +71,8 @@ An optional `conditions` list takes vanilla loot conditions, which must all pass
     "empty_weight": 5,
     "tomes": { "minecraft:swift_sneak": 1 } } } }
 ```
+
+Stronghold library shelf tomes come from the loot table `archive:shelves/stronghold_library`, which is empty except for its `loot_tomes` file (`data/archive/loot_tomes/shelves/stronghold_library.json`, the same tomes as the library chest), so packs can add or change them the same way.
 
 The `archive:set_tome` loot function (`{"function": "archive:set_tome", "enchantment": "minecraft:sharpness"}`) can also be used in your own loot tables. It refuses unobtainable enchants.
 

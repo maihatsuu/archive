@@ -32,6 +32,8 @@ public final class ArchiveConfig {
 	public boolean grindstone = true;
 	public boolean libraryTable = true;
 	public boolean stripBookLoot = true;
+	/** Stronghold libraries generate with chiseled bookshelves holding books and tomes (new chunks only). */
+	public boolean strongholdShelves = true;
 
 	// Experience
 	public int xpPerLevel = 50;

@@ -33,7 +33,11 @@ public class TomeTests implements FabricGameTest {
 		helper.assertTrue(tome.get(ModComponents.TOME_ENCHANTMENT).is(DataTests.enchant(helper, "minecraft", "sharpness").unwrapKey().orElseThrow()),
 				"tome should store sharpness");
 		helper.assertTrue(!tome.hasFoil(), "tome should have no glint");
-		helper.assertTrue(tome.getMaxStackSize() == 1, "tomes should not stack");
+		helper.assertTrue(tome.getMaxStackSize() == 16, "tomes should stack to 16");
+		helper.assertTrue(ItemStack.isSameItemSameComponents(tome, TomeItem.of(DataTests.enchant(helper, "minecraft", "sharpness"))),
+				"same-enchant tomes should stack");
+		helper.assertTrue(!ItemStack.isSameItemSameComponents(tome, TomeItem.of(DataTests.enchant(helper, "minecraft", "efficiency"))),
+				"different tomes shouldn't stack");
 		helper.assertTrue(tome.getHoverName().getContents() instanceof TranslatableContents contents
 				&& contents.getKey().equals("item.archive.tome"), "tome name should be just 'Tome'");
 		helper.assertTrue(TomeItem.enchantLine(DataTests.enchant(helper, "minecraft", "sharpness")).getStyle().getColor()

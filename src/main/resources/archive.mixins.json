@@ -16,6 +16,7 @@
 		"loot.AbstractVillagerMixin",
 		"loot.LootTableMixin",
 		"loot.ReloadableServerRegistriesMixin",
+		"loot.StrongholdLibraryMixin",
 		"table.EnchantingTableBlockMixin",
 		"tome.LecternBlockMixin"
 	],

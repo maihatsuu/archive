@@ -12,7 +12,8 @@
 			"maihatsuu.archive.test.AnvilGrindstoneTests",
 			"maihatsuu.archive.test.TomeTests",
 			"maihatsuu.archive.test.BookSourceTests",
-			"maihatsuu.archive.test.LibraryTableTests"
+			"maihatsuu.archive.test.LibraryTableTests",
+			"maihatsuu.archive.test.StrongholdTests"
 		]
 	},
 	"depends": {

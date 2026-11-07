@@ -19,7 +19,7 @@ import java.util.Comparator;
 
 public final class ModItems {
 	public static final TomeItem TOME = Registry.register(BuiltInRegistries.ITEM, Archive.id("tome"),
-			new TomeItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
+			new TomeItem(new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON)));
 
 	/** Enchants a tome may hold: anything not unobtainable, curses included (for minigames and the like). */
 	public static boolean isTomeEnchant(Holder<Enchantment> enchant) {
