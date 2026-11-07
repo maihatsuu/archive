@@ -4,12 +4,14 @@ import maihatsuu.archive.ArchiveConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Cloth Config screen for {@link ArchiveConfig}. Edits the live config instance, so settings read at use time
@@ -83,25 +85,36 @@ public final class ArchiveConfigScreen {
 				.setSaveConsumer(v -> config.tableShowLocked = v).build());
 
 		ConfigCategory mining = builder.getOrCreateCategory(Component.translatable("config.archive.category.mining"));
-		mining.addEntry(entries.startFloatField(name("diamondSpeed"), config.diamondSpeed)
-				.setDefaultValue(defaults.diamondSpeed).setMin(0.1F).setTooltip(tooltip("diamondSpeed"))
-				.requireRestart()
-				.setSaveConsumer(v -> config.diamondSpeed = v).build());
-		mining.addEntry(entries.startFloatField(name("netheriteSpeed"), config.netheriteSpeed)
-				.setDefaultValue(defaults.netheriteSpeed).setMin(0.1F).setTooltip(tooltip("netheriteSpeed"))
-				.requireRestart()
-				.setSaveConsumer(v -> config.netheriteSpeed = v).build());
-		mining.addEntry(entries.startFloatField(name("deepslateHardness"), config.deepslateHardness)
-				.setDefaultValue(defaults.deepslateHardness).setMin(0).setTooltip(tooltip("deepslateHardness"))
-				.setSaveConsumer(v -> config.deepslateHardness = v).build());
-		mining.addEntry(entries.startFloatField(name("deepslateOreHardness"), config.deepslateOreHardness)
-				.setDefaultValue(defaults.deepslateOreHardness).setMin(0).setTooltip(tooltip("deepslateOreHardness"))
-				.setSaveConsumer(v -> config.deepslateOreHardness = v).build());
-		mining.addEntry(entries.startFloatField(name("obsidianHardness"), config.obsidianHardness)
+		// Folded groups: tool speeds and block hardness.
+		SubCategoryBuilder speeds = entries.startSubCategory(Component.translatable("config.archive.group.toolSpeed"))
+				.setExpanded(false);
+		speed(entries, speeds, "woodSpeed", config.woodSpeed, defaults.woodSpeed, v -> config.woodSpeed = v);
+		speed(entries, speeds, "stoneSpeed", config.stoneSpeed, defaults.stoneSpeed, v -> config.stoneSpeed = v);
+		speed(entries, speeds, "ironSpeed", config.ironSpeed, defaults.ironSpeed, v -> config.ironSpeed = v);
+		speed(entries, speeds, "goldSpeed", config.goldSpeed, defaults.goldSpeed, v -> config.goldSpeed = v);
+		speed(entries, speeds, "diamondSpeed", config.diamondSpeed, defaults.diamondSpeed, v -> config.diamondSpeed = v);
+		speed(entries, speeds, "netheriteSpeed", config.netheriteSpeed, defaults.netheriteSpeed, v -> config.netheriteSpeed = v);
+		mining.addEntry(speeds.build());
+		SubCategoryBuilder hardness = entries.startSubCategory(Component.translatable("config.archive.group.hardness"))
+				.setExpanded(false);
+		hardness.add(entries.startFloatField(name("deepslateHardnessReduction"), config.deepslateHardnessReduction)
+				.setDefaultValue(defaults.deepslateHardnessReduction).setMin(0).setTooltip(tooltip("deepslateHardnessReduction"))
+				.setSaveConsumer(v -> config.deepslateHardnessReduction = v).build());
+		hardness.add(entries.startFloatField(name("obsidianHardness"), config.obsidianHardness)
 				.setDefaultValue(defaults.obsidianHardness).setMin(0).setTooltip(tooltip("obsidianHardness"))
 				.setSaveConsumer(v -> config.obsidianHardness = v).build());
+		mining.addEntry(hardness.build());
 
 		return builder.build();
+	}
+
+	/** A tool speed field: baked into the TOOL component at startup, so it needs a restart. */
+	private static void speed(ConfigEntryBuilder entries, SubCategoryBuilder group, String field, float value, float fallback,
+			Consumer<Float> save) {
+		group.add(entries.startFloatField(name(field), value)
+				.setDefaultValue(fallback).setMin(0.1F).setTooltip(tooltip(field))
+				.requireRestart()
+				.setSaveConsumer(save).build());
 	}
 
 	private static Component name(String field) {

@@ -46,10 +46,15 @@ public final class ArchiveConfig {
 	public boolean tableShowLocked = true;
 
 	// Mining
+	// Tool speeds: wood, stone, iron and gold stay at vanilla's values unless changed.
+	public float woodSpeed = 2.0F;
+	public float stoneSpeed = 4.0F;
+	public float ironSpeed = 6.0F;
+	public float goldSpeed = 12.0F;
 	public float diamondSpeed = 12.0F;
 	public float netheriteSpeed = 19.0F;
-	public float deepslateHardness = 2.0F;
-	public float deepslateOreHardness = 3.5F;
+	/** Subtracted from the vanilla hardness of every #archive:deepslate_hardness block (deepslate 3.0 → 2.0, ores 4.5 → 3.5). */
+	public float deepslateHardnessReduction = 1.0F;
 	public float obsidianHardness = 20.0F;
 
 	/** Item id → max durability, on top of Archive's own values (set an item to its vanilla number to undo Archive's). Applied at startup; needs a restart to change. */

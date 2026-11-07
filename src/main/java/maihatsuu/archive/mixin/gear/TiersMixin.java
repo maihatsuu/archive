@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Diamond and netherite mining speed. The TOOL component is built from {@code getSpeed()}
+ * Tool mining speed per tier (only diamond and netherite differ from vanilla by default). The TOOL component is built from {@code getSpeed()}
  * when {@code Items} initialises, so changing the config needs a restart.
  */
 @Mixin(Tiers.class)
@@ -19,11 +19,13 @@ public abstract class TiersMixin {
 		if (!config.mining) {
 			return;
 		}
-		Tiers self = (Tiers) (Object) this;
-		if (self == Tiers.DIAMOND) {
-			cir.setReturnValue(config.diamondSpeed);
-		} else if (self == Tiers.NETHERITE) {
-			cir.setReturnValue(config.netheriteSpeed);
-		}
+		cir.setReturnValue(switch ((Tiers) (Object) this) {
+			case WOOD -> config.woodSpeed;
+			case STONE -> config.stoneSpeed;
+			case IRON -> config.ironSpeed;
+			case GOLD -> config.goldSpeed;
+			case DIAMOND -> config.diamondSpeed;
+			case NETHERITE -> config.netheriteSpeed;
+		});
 	}
 }

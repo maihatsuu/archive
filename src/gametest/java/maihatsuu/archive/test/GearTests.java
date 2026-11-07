@@ -54,7 +54,8 @@ public class GearTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void blockHardness(GameTestHelper helper) {
 		assertHardness(helper, Blocks.DEEPSLATE, 2.0F);
-		assertHardness(helper, Blocks.COBBLED_DEEPSLATE_STAIRS, 2.0F);
+		assertHardness(helper, Blocks.COBBLED_DEEPSLATE_STAIRS, 2.5F);
+		assertHardness(helper, Blocks.DEEPSLATE_TILES, 2.5F);
 		assertHardness(helper, Blocks.DEEPSLATE_DIAMOND_ORE, 3.5F);
 		assertHardness(helper, Blocks.DEEPSLATE_COAL_ORE, 3.5F);
 		assertHardness(helper, Blocks.OBSIDIAN, 20.0F);
