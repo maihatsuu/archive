@@ -1,10 +1,15 @@
 package maihatsuu.archive.test;
 
 import maihatsuu.archive.RepairMaterials;
+import maihatsuu.archive.ArchiveConfig;
 import maihatsuu.archive.table.EnchantLevels;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -81,16 +86,48 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void repairMaterials(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
-		Map<Item, Item> pairs = new LinkedHashMap<>(RepairMaterials.MAP);
-		pairs.put(Items.MACE, Items.BREEZE_ROD);
-		pairs.forEach((item, material) -> {
-			ItemStack result = anvil(player, damaged(new ItemStack(item), 10), new ItemStack(material)).getSlot(2).getItem();
-			helper.assertTrue(result.is(item) && result.getDamageValue() == 0, "one " + material + " should fully repair " + item);
+		// Every item in Archive's table repairs with one unit of its material (a tag's first item), except unbreakable netherite.
+		RepairMaterials.DEFAULTS.forEach((id, material) -> {
+			Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(id));
+			ItemStack stack = new ItemStack(item);
+			if (!stack.isDamageableItem()) {
+				return;
+			}
+			ItemStack unit = material.startsWith("#")
+					? new ItemStack(BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, ResourceLocation.parse(material.substring(1))))
+							.orElseThrow().get(0))
+					: new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(material)));
+			ItemStack result = anvil(player, damaged(stack, 10), unit).getSlot(2).getItem();
+			helper.assertTrue(result.is(item) && result.getDamageValue() == 0, "one " + unit + " should fully repair " + id);
 		});
 		helper.assertTrue(anvil(player, damaged(new ItemStack(Items.TRIDENT), 100), new ItemStack(Items.BREEZE_ROD))
 				.getSlot(2).getItem().isEmpty(), "a breeze rod shouldn't repair a trident");
 		helper.assertTrue(anvil(player, damaged(new ItemStack(Items.SHEARS), 10), new ItemStack(Items.STRING))
 				.getSlot(2).getItem().isEmpty(), "string shouldn't repair shears");
+		player.discard();
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void repairOverrides(GameTestHelper helper) {
+		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		Map<String, String> overrides = ArchiveConfig.get().repairOverrides;
+		Map<String, String> saved = new LinkedHashMap<>(overrides);
+		try {
+			overrides.put("minecraft:chainmail_chestplate", "minecraft:chain");
+			overrides.put("minecraft:elytra", "");
+			helper.assertTrue(anvil(player, damaged(new ItemStack(Items.CHAINMAIL_CHESTPLATE), 10), new ItemStack(Items.CHAIN))
+					.getSlot(2).getItem().getDamageValue() == 0, "an override should let a chain repair a chainmail chestplate");
+			helper.assertTrue(anvil(player, damaged(new ItemStack(Items.CHAINMAIL_CHESTPLATE), 10), new ItemStack(Items.IRON_INGOT))
+					.getSlot(2).getItem().isEmpty(), "an override should replace vanilla's iron ingot");
+			helper.assertTrue(anvil(player, damaged(new ItemStack(Items.CHAINMAIL_HELMET), 10), new ItemStack(Items.IRON_INGOT))
+					.getSlot(2).getItem().getDamageValue() == 0, "other chainmail pieces keep the iron ingot");
+			helper.assertTrue(anvil(player, damaged(new ItemStack(Items.ELYTRA), 10), new ItemStack(Items.PHANTOM_MEMBRANE))
+					.getSlot(2).getItem().isEmpty(), "an empty override should leave the elytra with no repair material");
+		} finally {
+			overrides.clear();
+			overrides.putAll(saved);
+		}
 		player.discard();
 		helper.succeed();
 	}

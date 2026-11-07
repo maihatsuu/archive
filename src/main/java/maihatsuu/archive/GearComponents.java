@@ -5,20 +5,19 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Unbreakable;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Default item components: Archive's durability values, then the config's {@code durabilityOverrides} on top,
- * and unbreakable netherite gear.
+ * Default item components: Archive's durability values, then the config's {@code durabilityOverrides} on top.
+ * A durability of 0 or less makes the item unbreakable instead (netherite gear by default).
  */
 public final class GearComponents {
-	/** Archive's durability table (from the "Durability Values" spreadsheet), by item id. */
-	static final Map<String, Integer> DEFAULT_DURABILITY = Map.ofEntries(
+	/** Archive's durability table (from the "Durability Values" spreadsheet), by item id, in display order. 0 = unbreakable. */
+	public static final Map<String, Integer> DEFAULT_DURABILITY = ordered(
 			Map.entry("minecraft:wooden_sword", 32),
 			Map.entry("minecraft:wooden_pickaxe", 32),
 			Map.entry("minecraft:wooden_axe", 32),
@@ -44,6 +43,11 @@ public final class GearComponents {
 			Map.entry("minecraft:diamond_axe", 2048),
 			Map.entry("minecraft:diamond_shovel", 2048),
 			Map.entry("minecraft:diamond_hoe", 2048),
+			Map.entry("minecraft:netherite_sword", 0),
+			Map.entry("minecraft:netherite_pickaxe", 0),
+			Map.entry("minecraft:netherite_axe", 0),
+			Map.entry("minecraft:netherite_shovel", 0),
+			Map.entry("minecraft:netherite_hoe", 0),
 			Map.entry("minecraft:leather_helmet", 64),
 			Map.entry("minecraft:leather_chestplate", 64),
 			Map.entry("minecraft:leather_leggings", 64),
@@ -64,6 +68,10 @@ public final class GearComponents {
 			Map.entry("minecraft:diamond_chestplate", 2048),
 			Map.entry("minecraft:diamond_leggings", 2048),
 			Map.entry("minecraft:diamond_boots", 2048),
+			Map.entry("minecraft:netherite_helmet", 0),
+			Map.entry("minecraft:netherite_chestplate", 0),
+			Map.entry("minecraft:netherite_leggings", 0),
+			Map.entry("minecraft:netherite_boots", 0),
 			Map.entry("minecraft:turtle_helmet", 512),
 			Map.entry("minecraft:bow", 512),
 			Map.entry("minecraft:crossbow", 512),
@@ -80,9 +88,14 @@ public final class GearComponents {
 			Map.entry("minecraft:warped_fungus_on_a_stick", 256)
 	);
 
-	private static final List<Item> UNBREAKABLE = List.of(
-			Items.NETHERITE_SWORD, Items.NETHERITE_PICKAXE, Items.NETHERITE_AXE, Items.NETHERITE_SHOVEL, Items.NETHERITE_HOE,
-			Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS);
+	@SafeVarargs
+	private static Map<String, Integer> ordered(Map.Entry<String, Integer>... entries) {
+		Map<String, Integer> map = new LinkedHashMap<>();
+		for (Map.Entry<String, Integer> entry : entries) {
+			map.put(entry.getKey(), entry.getValue());
+		}
+		return Collections.unmodifiableMap(map);
+	}
 
 	static void register() {
 		DefaultItemComponentEvents.MODIFY.register(context -> {
@@ -99,9 +112,16 @@ public final class GearComponents {
 					Archive.LOGGER.warn("durabilityOverrides: '{}' is not a damageable item, skipping", entry.getKey());
 					continue;
 				}
-				context.modify(item, builder -> builder.set(DataComponents.MAX_DAMAGE, entry.getValue()));
+				int value = entry.getValue();
+				// Unbreakable items keep their vanilla max damage; the component just stops it being used.
+				context.modify(item, builder -> {
+					if (value <= 0) {
+						builder.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
+					} else {
+						builder.set(DataComponents.MAX_DAMAGE, value);
+					}
+				});
 			}
-			context.modify(UNBREAKABLE, (builder, item) -> builder.set(DataComponents.UNBREAKABLE, new Unbreakable(true)));
 		});
 	}
 

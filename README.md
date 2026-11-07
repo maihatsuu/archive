@@ -17,7 +17,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 - **Gear.**
   - Netherite gear is unbreakable.
   - New durability for every other tool, weapon and armor piece, in powers of two by tier: wood 32, stone 128, gold 64, chainmail 128, iron 512, diamond 2048 (tools and armor alike; leather 64). Bow, crossbow and shield 512; trident, mace and elytra 2048; fishing rod, shears, flint and steel, brush and the sticks 256.
-  - Gear with no vanilla repair material gets one: string for the bow, crossbow and fishing rod; carrot and warped fungus for their sticks; flint for flint and steel; iron ingot for shears; feather for the brush; prismarine shard for the trident. The mace repairs with breeze rods (vanilla). One unit is a full repair.
+  - Gear with no vanilla repair material gets one: string for the bow, crossbow and fishing rod; carrot and warped fungus for their sticks; flint for flint and steel; iron ingot for shears; feather for the brush; prismarine shard for the trident. The mace repairs with breeze rods (vanilla). One unit is a full repair. Every repair material can be changed in the config.
   - Diamond mining speed is 12 and netherite is 19.
   - Deepslate blocks lose 1.0 hardness: deepslate 3.0 → 2.0, cobbled, polished, bricks and tiles 3.5 → 2.5, ores 4.5 → 3.5.
   - Obsidian, crying obsidian, respawn anchors and ender chests have hardness 20.0.
@@ -27,7 +27,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 
 ## Config
 
-`config/archive.json` is created on first launch. With [Mod Menu](https://modrinth.com/mod/modmenu) installed, everything except `durabilityOverrides` can also be edited in game (Mods → Archive → Config). Archive requires [Cloth Config](https://modrinth.com/mod/cloth-config) for that screen.
+`config/archive.json` is created on first launch. With [Mod Menu](https://modrinth.com/mod/modmenu) installed, everything can also be edited in game (Mods → Archive → Config), including per-item durability on the Durability tab. Archive requires [Cloth Config](https://modrinth.com/mod/cloth-config) for that screen.
 
 | Key | Default | |
 |---|---|---|
@@ -38,7 +38,8 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 | `shelfSteps` | `[0, 5, 10]` | Plain bookshelves needed for each level unlocked without a tome |
 | `woodSpeed` / `stoneSpeed` / `ironSpeed` / `goldSpeed` / `diamondSpeed` / `netheriteSpeed` | `2` / `4` / `6` / `12` / `12` / `19` | Tool mining speed per tier (restart needed). Only diamond and netherite differ from vanilla (8 and 9) |
 | `deepslateHardnessReduction` / `obsidianHardness` | `1.0` / `20.0` | Taken off the vanilla hardness of deepslate blocks (ores included); set hardness of the obsidian suite |
-| `durabilityOverrides` | `{}` | Item id → max durability, applied on top of Archive's values, e.g. `{"minecraft:iron_pickaxe": 500}` (restart needed). Set an item to its vanilla number to undo Archive's change |
+| `durabilityOverrides` | `{}` | Item id → max durability, applied on top of Archive's values, e.g. `{"minecraft:iron_pickaxe": 500}` (restart needed). Set an item to its vanilla number to undo Archive's change. `0` (or less) makes it unbreakable; netherite gear defaults to `0`, so give it a number to make it breakable again |
+| `repairOverrides` | `{}` | Item id → anvil repair material, an item id or `#tag` (`""` for none), replacing Archive's or vanilla's, e.g. `{"minecraft:chainmail_chestplate": "minecraft:chain"}`. Applies at once. Needs `durability` on |
 
 Client and server should use the same XP, mining, hardness and `tableRadius` values, or the client will predict them wrong (the client draws the bookshelf particles from its own `tableRadius`).
 

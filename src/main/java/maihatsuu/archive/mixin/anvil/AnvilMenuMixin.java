@@ -1,6 +1,9 @@
 package maihatsuu.archive.mixin.anvil;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import maihatsuu.archive.ArchiveConfig;
+import maihatsuu.archive.RepairMaterials;
 import maihatsuu.archive.table.EnchantLevels;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -12,6 +15,7 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.ItemCombinerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * The anvil only repairs (one unit of the base material restores full durability) and renames. Repairs cost
+ * The anvil only repairs (one unit of the repair material, see {@link RepairMaterials}, restores full durability) and renames. Repairs cost
  * the item's total enchant levels ({@link EnchantLevels#total}), so unenchanted gear repairs for free;
  * renaming is always free. No combining items, no applying books or tomes, no prior-work penalty.
  */
@@ -66,7 +70,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 
 		if (!right.isEmpty()) {
 			// isDamageableItem is false for unbreakable items, so those can't be repaired.
-			if (!result.isDamageableItem() || !left.getItem().isValidRepairItem(left, right)) {
+			if (!result.isDamageableItem() || !RepairMaterials.isValidRepair(left, right)) {
 				return ItemStack.EMPTY;
 			}
 			if (result.getDamageValue() <= 0) {
@@ -89,6 +93,13 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 		}
 
 		return changed ? result : ItemStack.EMPTY;
+	}
+
+	/** Archive's repair materials (and the config's overrides) also apply to the vanilla anvil, when the rework is off. */
+	@WrapOperation(method = "createResult", at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/world/item/Item;isValidRepairItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"))
+	private boolean archive$repairMaterials(Item item, ItemStack tool, ItemStack repair, Operation<Boolean> original) {
+		return RepairMaterials.isValidRepair(tool, repair);
 	}
 
 	/** Vanilla also requires cost > 0; here free results (renames, unenchanted repairs) can be taken too. */

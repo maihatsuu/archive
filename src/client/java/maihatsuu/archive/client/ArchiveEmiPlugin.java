@@ -3,7 +3,6 @@ package maihatsuu.archive.client;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
-import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -23,6 +22,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,17 +31,15 @@ import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /**
  * EMI entrypoint, only loaded when EMI is installed. Makes EMI's recipe list match Archive: removes the
- * anvil combining and book recipes, grindstone repairs and crafting-grid repairs, redraws material
- * repairs as full repairs and disenchanting on Archive's single-slot grindstone, drops them for unbreakable gear, and adds the repair materials EMI doesn't
- * know about (it hardcodes repairs for tool tiers, armor, the elytra and the shield, not even the mace). Enchanted books are hidden through the
- * {@code #c:hidden_from_recipe_viewers} tag, which JEI and REI read too.
+ * anvil combining and book recipes, grindstone repairs and crafting-grid repairs, draws every material repair
+ * from {@link RepairMaterials} (EMI hardcodes its own list, which misses the mace and Archive's materials and
+ * ignores config overrides), and draws disenchanting on Archive's single-slot grindstone. Enchanted books are
+ * hidden through the {@code #c:hidden_from_recipe_viewers} tag, which JEI and REI read too.
  */
 public final class ArchiveEmiPlugin implements EmiPlugin {
 	@Override
@@ -53,42 +51,30 @@ public final class ArchiveEmiPlugin implements EmiPlugin {
 				return false;
 			}
 			String path = id.getPath();
+			if (path.startsWith("/anvil/repairing/material/")) {
+				// Always redrawn below from Archive's table (with its overrides).
+				return true;
+			}
 			if (config.anvil && (path.startsWith("/anvil/repairing/") || path.startsWith("/anvil/enchanting/")
 					|| path.startsWith("/crafting/repairing/"))) {
-				// Material repairs included: EMI draws them as vanilla's 25% per unit, so they're re-added below.
 				return true;
 			}
-			if (config.grindstone && path.startsWith("/grindstone/")) {
-				// Disenchanting included: EMI draws vanilla's two-slot grindstone, so it's re-added below.
-				return true;
-			}
-			return config.durability && path.startsWith("/anvil/repairing/material/") && isUnbreakable(recipe);
+			// Disenchanting included: EMI draws vanilla's two-slot grindstone, so it's re-added below.
+			return config.grindstone && path.startsWith("/grindstone/");
 		});
 
-		// With the anvil rework on, every material repair is Archive's (one unit, full repair). Otherwise
-		// EMI's own vanilla ones stay and only the materials it doesn't know about are added.
-		Map<Item, Ingredient> materials = new LinkedHashMap<>();
-		if (config.anvil) {
-			for (Item item : BuiltInRegistries.ITEM) {
-				Ingredient material = vanillaMaterial(item);
-				if (material != null && !material.isEmpty()) {
-					materials.put(item, material);
-				}
+		// One recipe per repairable item: Archive's material (or override) when it has one, else vanilla's.
+		for (Item item : BuiltInRegistries.ITEM) {
+			ItemStack stack = new ItemStack(item);
+			if (stack.getMaxDamage() <= 0 || stack.has(DataComponents.UNBREAKABLE)) {
+				continue;
+			}
+			String material = RepairMaterials.material(item);
+			EmiIngredient ingredient = material != null ? ingredient(material) : vanillaMaterial(item);
+			if (ingredient != null && !ingredient.isEmpty()) {
+				registry.addRecipe(new RepairRecipe(item, ingredient, config.anvil));
 			}
 		}
-		if (config.durability) {
-			RepairMaterials.MAP.forEach((tool, material) -> materials.put(tool, Ingredient.of(material)));
-			if (!config.anvil) {
-				// Vanilla repairs the mace with breeze rods, but EMI doesn't list it.
-				materials.put(Items.MACE, Ingredient.of(Items.BREEZE_ROD));
-			}
-		}
-		materials.forEach((tool, material) -> {
-			ItemStack stack = new ItemStack(tool);
-			if (stack.getMaxDamage() > 0 && !stack.has(DataComponents.UNBREAKABLE)) {
-				registry.addRecipe(new RepairRecipe(tool, EmiIngredient.of(material), config.anvil));
-			}
-		});
 
 		ClientLevel level = Minecraft.getInstance().level;
 		if (config.grindstone && level != null) {
@@ -105,24 +91,35 @@ public final class ArchiveEmiPlugin implements EmiPlugin {
 		}
 	}
 
-	/** The repair material vanilla gives an item, found the way EMI finds it, plus the mace. */
-	private static Ingredient vanillaMaterial(Item item) {
-		if (item instanceof ArmorItem armor) {
-			return armor.getMaterial().value().repairIngredient().get();
-		} else if (item instanceof TieredItem tiered) {
-			return tiered.getTier().getRepairIngredient();
-		} else if (item == Items.ELYTRA) {
-			return Ingredient.of(Items.PHANTOM_MEMBRANE);
-		} else if (item == Items.SHIELD) {
-			return Ingredient.of(ItemTags.PLANKS);
-		} else if (item == Items.MACE) {
-			return Ingredient.of(Items.BREEZE_ROD);
+	/** An item id or #tag from {@link RepairMaterials}; null for none or an unknown item. */
+	private static EmiIngredient ingredient(String material) {
+		if (material.isEmpty()) {
+			return null;
 		}
-		return null;
+		boolean tag = material.startsWith("#");
+		ResourceLocation id = ResourceLocation.tryParse(tag ? material.substring(1) : material);
+		if (id == null) {
+			return null;
+		}
+		return tag ? EmiIngredient.of(TagKey.create(Registries.ITEM, id))
+				: BuiltInRegistries.ITEM.getOptional(id).<EmiIngredient>map(EmiStack::of).orElse(null);
 	}
 
-	private static boolean isUnbreakable(EmiRecipe recipe) {
-		return recipe.getOutputs().stream().anyMatch(stack -> stack.getItemStack().has(DataComponents.UNBREAKABLE));
+	/** The repair material vanilla gives an item not in Archive's table (modded gear, or durability off), found the way EMI finds it. */
+	private static EmiIngredient vanillaMaterial(Item item) {
+		Ingredient material = null;
+		if (item instanceof ArmorItem armor) {
+			material = armor.getMaterial().value().repairIngredient().get();
+		} else if (item instanceof TieredItem tiered) {
+			material = tiered.getTier().getRepairIngredient();
+		} else if (item == Items.ELYTRA) {
+			material = Ingredient.of(Items.PHANTOM_MEMBRANE);
+		} else if (item == Items.SHIELD) {
+			material = Ingredient.of(ItemTags.PLANKS);
+		} else if (item == Items.MACE) {
+			material = Ingredient.of(Items.BREEZE_ROD);
+		}
+		return material == null || material.isEmpty() ? null : EmiIngredient.of(material);
 	}
 
 	/** An anvil repair drawn like EMI's own: one unit fully repairs (Archive's anvil) or restores 25% (vanilla's). */

@@ -59,6 +59,8 @@ public final class ArchiveConfig {
 
 	/** Item id → max durability, on top of Archive's own values (set an item to its vanilla number to undo Archive's). Applied at startup; needs a restart to change. */
 	public Map<String, Integer> durabilityOverrides = new LinkedHashMap<>();
+	/** Item id → anvil repair material (an item id or #tag; "" for none), on top of Archive's defaults. Needs durability on. */
+	public Map<String, String> repairOverrides = new LinkedHashMap<>();
 
 	public static ArchiveConfig get() {
 		if (instance == null) {
