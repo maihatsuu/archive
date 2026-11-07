@@ -62,6 +62,10 @@ dependencies {
 	}
 	modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 	modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+
+	// EMI integration is optional: only its API is compiled against (same Terraformers maven as Mod Menu).
+	modCompileOnly "dev.emi:emi-fabric:${project.emi_version}:api"
+	modLocalRuntime "dev.emi:emi-fabric:${project.emi_version}"
 }
 
 processResources {

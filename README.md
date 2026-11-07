@@ -23,6 +23,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
   - Obsidian, crying obsidian, respawn anchors and ender chests have hardness 20.0.
 - **Anvil** only repairs and renames, and never chips (chipped and damaged anvils are hidden from creative). One unit of the base material (e.g. 1 iron ingot) fully repairs an item. A repair costs 1 XP level per enchant level on the item (Fire Aspect II = 2 levels; unenchanted gear and curses are free), with no "Too Expensive!" cap. Renaming is free. Two damaged items can't be combined in the crafting grid either.
 - **Grindstone** only disenchants a single item and gives back 1 XP level per enchant level removed (Sharpness V + Sweeping Edge III = 8 levels; curses stay and give nothing). Its screen is titled "Disenchant" and has a single input slot.
+- **Recipe viewers.** Vanilla enchanted books are tagged `#c:hidden_from_recipe_viewers`, so EMI, JEI and REI hide them. With [EMI](https://modrinth.com/mod/emi) (optional), the recipe list also matches Archive: no anvil combining or book recipes, no grindstone or crafting-grid repairs, no repairs for unbreakable gear, and Archive's repair materials plus the mace are listed.
 
 ## Config
 

@@ -22,6 +22,9 @@
 		],
 		"modmenu": [
 			"maihatsuu.archive.client.ArchiveModMenu"
+		],
+		"emi": [
+			"maihatsuu.archive.client.ArchiveEmiPlugin"
 		]
 	},
 	"mixins": [
@@ -39,6 +42,7 @@
 		"cloth-config": ">=15"
 	},
 	"suggests": {
-		"modmenu": "*"
+		"modmenu": "*",
+		"emi": "*"
 	}
 }
