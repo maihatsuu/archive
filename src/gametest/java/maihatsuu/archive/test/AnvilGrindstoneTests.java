@@ -1,5 +1,6 @@
 package maihatsuu.archive.test;
 
+import maihatsuu.archive.RepairMaterials;
 import maihatsuu.archive.table.EnchantLevels;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.component.DataComponents;
@@ -12,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.GrindstoneMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -22,7 +24,9 @@ import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Phase 4: anvil repairs (costing the enchant levels) and renames only; grindstone only disenchants. */
 public class AnvilGrindstoneTests implements FabricGameTest {
@@ -75,14 +79,18 @@ public class AnvilGrindstoneTests implements FabricGameTest {
 	}
 
 	@GameTest(template = EMPTY_STRUCTURE)
-	public void tridentAndMaceRepair(GameTestHelper helper) {
+	public void repairMaterials(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
-		ItemStack trident = anvil(player, damaged(new ItemStack(Items.TRIDENT), 100), new ItemStack(Items.PRISMARINE_SHARD)).getSlot(2).getItem();
-		helper.assertTrue(trident.is(Items.TRIDENT) && trident.getDamageValue() == 0, "a prismarine shard should fully repair a trident");
-		ItemStack mace = anvil(player, damaged(new ItemStack(Items.MACE), 100), new ItemStack(Items.BREEZE_ROD)).getSlot(2).getItem();
-		helper.assertTrue(mace.is(Items.MACE) && mace.getDamageValue() == 0, "a breeze rod should fully repair a mace");
+		Map<Item, Item> pairs = new LinkedHashMap<>(RepairMaterials.MAP);
+		pairs.put(Items.MACE, Items.BREEZE_ROD);
+		pairs.forEach((item, material) -> {
+			ItemStack result = anvil(player, damaged(new ItemStack(item), 10), new ItemStack(material)).getSlot(2).getItem();
+			helper.assertTrue(result.is(item) && result.getDamageValue() == 0, "one " + material + " should fully repair " + item);
+		});
 		helper.assertTrue(anvil(player, damaged(new ItemStack(Items.TRIDENT), 100), new ItemStack(Items.BREEZE_ROD))
 				.getSlot(2).getItem().isEmpty(), "a breeze rod shouldn't repair a trident");
+		helper.assertTrue(anvil(player, damaged(new ItemStack(Items.SHEARS), 10), new ItemStack(Items.STRING))
+				.getSlot(2).getItem().isEmpty(), "string shouldn't repair shears");
 		player.discard();
 		helper.succeed();
 	}
