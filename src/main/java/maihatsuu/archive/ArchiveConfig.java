@@ -34,6 +34,8 @@ public final class ArchiveConfig {
 	public boolean stripBookLoot = true;
 	/** Stronghold libraries generate with chiseled bookshelves holding books and tomes (new chunks only). */
 	public boolean strongholdShelves = true;
+	/** Which is obtainable: Resilience (true) or fire, blast and projectile protection (false). Read when a world loads. */
+	public boolean resilience = true;
 
 	// Experience
 	public int xpPerLevel = 50;

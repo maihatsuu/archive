@@ -1,0 +1,24 @@
+{
+  "pack": {
+    "pack_format": 48,
+    "supported_formats": [
+      34,
+      48
+    ],
+    "description": "Archive"
+  },
+  "fabric:overlays": {
+    "entries": [
+      {
+        "directory": "no_resilience",
+        "condition": {
+          "condition": "fabric:not",
+          "value": {
+            "condition": "archive:config",
+            "option": "resilience"
+          }
+        }
+      }
+    ]
+  }
+}

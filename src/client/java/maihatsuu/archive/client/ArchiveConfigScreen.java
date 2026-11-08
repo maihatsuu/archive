@@ -68,6 +68,9 @@ public final class ArchiveConfigScreen {
 		general.addEntry(entries.startBooleanToggle(name("strongholdShelves"), config.strongholdShelves)
 				.setDefaultValue(defaults.strongholdShelves).setTooltip(tooltip("strongholdShelves"))
 				.setSaveConsumer(v -> config.strongholdShelves = v).build());
+		general.addEntry(entries.startBooleanToggle(name("resilience"), config.resilience)
+				.setDefaultValue(defaults.resilience).setTooltip(tooltip("resilience"))
+				.setSaveConsumer(v -> config.resilience = v).build());
 
 		ConfigCategory xp = builder.getOrCreateCategory(Component.translatable("config.archive.category.experience"));
 		xp.addEntry(entries.startIntField(name("xpPerLevel"), config.xpPerLevel)

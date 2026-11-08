@@ -95,6 +95,8 @@
 	"config.archive.libraryTable.tooltip": "Replaces vanilla's enchanting menu.",
 	"config.archive.stripBookLoot": "Remove enchanted book sources",
 	"config.archive.stripBookLoot.tooltip": "No enchanted books in loot or trades.",
+	"config.archive.resilience": "Resilience",
+	"config.archive.resilience.tooltip": "Resilience replaces fire, blast and projectile protection. Off makes Resilience unobtainable and the three obtainable instead. Applies when a world loads.",
 	"config.archive.strongholdShelves": "Stronghold library shelves",
 	"config.archive.strongholdShelves.tooltip": "Library chests become chiseled bookshelves with books and tomes. New chunks only.",
 	"config.archive.xpPerLevel": "XP per level",

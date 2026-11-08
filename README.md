@@ -11,7 +11,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
   - Protection maxes at III.
   - Thorns is chestplate-only.
   - Depth Strider moves to leggings.
-  - New **Resilience** (chestplate, max III): reduces fire, explosion and projectile damage, burn time and knockback. It stacks with Protection.
+  - New **Resilience** (chestplate, max III): reduces fire, explosion and projectile damage, burn time and knockback. It stacks with Protection. It replaces Fire, Blast and Projectile Protection, which are removed (config `resilience: false` swaps which is obtainable).
 - **No vanilla enchanted books** from loot chests, fishing, bartering, hero-of-the-village gifts or villager trades.
 - **Stronghold library shelves.** Stronghold libraries no longer have chests. Instead each newly generated library has 12–24 chiseled bookshelves holding up to six books in random slots, and each book has a 20% chance to be a tome.
 - **Flat XP curve.** Every level costs 50 XP, levels cap at 100, a Bottle o' Enchanting gives one level, and you drop 50% of your XP on death.
@@ -33,6 +33,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 | Key | Default | |
 |---|---|---|
 | `xpCurve`, `durability`, `mining`, `anvil`, `grindstone`, `libraryTable`, `stripBookLoot` | `true` | Toggle each subsystem |
+| `resilience` | `true` | Resilience is obtainable and Fire, Blast and Projectile Protection aren't. `false` swaps them: Resilience joins the unobtainable enchants and the three come back in tomes, loot and the table. Existing items keep their enchants either way. Read when a world loads |
 | `strongholdShelves` | `true` | Stronghold libraries get chiseled bookshelves with books and tomes instead of chests (only affects newly generated chunks) |
 | `xpPerLevel` / `levelCap` / `deathXpFraction` | `50` / `100` / `0.5` | XP curve |
 | `tableShowLocked` | `true` | Table lists every enchant that fits the item, with locked rows and hints. `false` lists only what can be enchanted now. Client-side display only |
@@ -56,7 +57,7 @@ The enchantment and tag changes are data, not code. They're always on, and a dat
   "levels": [ { "xp": 5, "lapis": 1 }, { "xp": 10, "lapis": 2 } ] }
 ```
 
-**Loot tomes:** `data/<namespace>/loot_tomes/<any>.json`, from any datapack or mod, reloaded with `/reload`. Each loot table listed in a file gets one extra pool with one roll from that file, so two files naming the same table give two rolls. `empty_weight` is the weight of "no tome". Unknown enchantments are skipped with a warning, so a file can list enchants from mods that may not be installed. To change or remove another pack's entries, override its file at the same path. Archive ships one file per loot table at `data/archive/loot_tomes/<table path>.json` (for example `chests/stronghold_library.json`), generated from a spreadsheet with `tools/csv_to_loot_tomes.py`.
+**Loot tomes:** `data/<namespace>/loot_tomes/<any>.json`, from any datapack or mod, reloaded with `/reload`. Each loot table listed in a file gets one extra pool with one roll from that file, so two files naming the same table give two rolls. `empty_weight` is the weight of "no tome". Unknown enchantments are skipped with a warning, so a file can list enchants from mods that may not be installed. To change or remove another pack's entries, override its file at the same path. Archive ships one file per loot table at `data/archive/loot_tomes/<table path>.json` (for example `chests/stronghold_library.json`), generated from a spreadsheet with `tools/csv_to_loot_tomes.py`. Files that list Resilience have a copy in the `no_resilience/` overlay (used when `resilience` is off) with Fire, Blast and Projectile Protection at Resilience's weight; the script writes both.
 ```json
 { "tables": { "minecraft:chests/stronghold_library": {
     "empty_weight": 10,

@@ -23,6 +23,7 @@ public class Archive implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ArchiveConfig.get();
+		ConfigCondition.register();
 		ModComponents.init();
 		ModItems.init();
 		ModLootFunctions.init();
