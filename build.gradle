@@ -35,6 +35,14 @@ loom {
 	}
 
 	runs {
+		// Own folder, so the dev server has its own config/archive.json and the client's config sync can be tested.
+		server {
+			runDir "run/server"
+		}
+		// Fixed offline name (instead of a random PlayerNNN), so the dev server can op it in run/server/ops.json.
+		client {
+			programArgs "--username", "Dev"
+		}
 		// Headless server that runs every @GameTest and exits; non-zero exit on failure.
 		gametest {
 			server()

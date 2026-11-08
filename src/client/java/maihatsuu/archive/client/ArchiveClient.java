@@ -12,5 +12,6 @@ public class ArchiveClient implements ClientModInitializer {
 		TomeItem.clientOpener = stack -> Minecraft.getInstance().setScreen(new TomeScreen(stack));
 		MenuScreens.register(ModMenus.LIBRARY_ENCHANT, LibraryEnchantScreen::new);
 		MenuScreens.register(ModMenus.LECTERN_TOME, LecternTomeScreen::new);
+		ServerConfigClient.register();
 	}
 }

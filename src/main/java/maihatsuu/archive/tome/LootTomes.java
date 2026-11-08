@@ -92,6 +92,15 @@ public final class LootTomes {
 		});
 	}
 
+	/** Every tome the files give a table, with weights summed across files (unknown enchants included). */
+	public static Map<ResourceLocation, Integer> tomes(ResourceLocation table) {
+		Map<ResourceLocation, Integer> merged = new LinkedHashMap<>();
+		for (TableEntry entry : tables.getOrDefault(table, List.of())) {
+			entry.tomes().forEach((id, weight) -> merged.merge(id, weight, Integer::sum));
+		}
+		return merged;
+	}
+
 	/** Reads every {@code loot_tomes} file from the reloading datapacks. */
 	public static void load(ResourceManager manager) {
 		Map<ResourceLocation, JsonElement> files = new HashMap<>();

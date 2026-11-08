@@ -3,6 +3,7 @@ package maihatsuu.archive;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -23,6 +24,8 @@ import java.util.Map;
 public final class ArchiveConfig {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 	private static ArchiveConfig instance;
+	/** A remote server's config, while connected to one (client only). */
+	private static volatile ArchiveConfig server;
 
 	// Subsystem toggles
 	public boolean xpCurve = true;
@@ -34,6 +37,8 @@ public final class ArchiveConfig {
 	public boolean stripBookLoot = true;
 	/** Stronghold libraries generate with chiseled bookshelves holding books and tomes (new chunks only). */
 	public boolean strongholdShelves = true;
+	/** Library shelves can also hold tomes for modded enchants that no shelf loot_tomes file lists, at weight 1 each. */
+	public boolean shelfModdedEnchants = true;
 	/** Which is obtainable: Resilience (true) or fire, blast and projectile protection (false). Read when a world loads. */
 	public boolean resilience = true;
 
@@ -66,11 +71,42 @@ public final class ArchiveConfig {
 	/** Item id → anvil repair material (an item id or #tag; "" for none), on top of Archive's defaults. Needs durability on. */
 	public Map<String, String> repairOverrides = new LinkedHashMap<>();
 
+	/** The config in effect: the server's while connected to a remote server, else this game's own file. */
 	public static ArchiveConfig get() {
+		ArchiveConfig fromServer = server;
+		return fromServer != null ? fromServer : local();
+	}
+
+	/** This game's own config file, whatever server it's connected to (the config screen edits this one). */
+	public static ArchiveConfig local() {
 		if (instance == null) {
 			instance = load();
 		}
 		return instance;
+	}
+
+	public String toJson() {
+		return GSON.toJson(this);
+	}
+
+	/**
+	 * Uses a remote server's config (JSON from {@link ConfigSyncPayload}) until called with null on disconnect.
+	 * Client-only display settings stay the player's own. Callers then run {@link GearComponents#rebuild} so
+	 * durability and tool speeds follow too.
+	 */
+	public static void applyServer(@Nullable String json) {
+		if (json == null) {
+			server = null;
+			return;
+		}
+		try {
+			ArchiveConfig received = GSON.fromJson(json, ArchiveConfig.class);
+			received.tableShowLocked = local().tableShowLocked;
+			server = received;
+		} catch (Exception e) {
+			Archive.LOGGER.error("Couldn't read the server's config, using this game's own", e);
+			server = null;
+		}
 	}
 
 	private static Path path() {

@@ -13,7 +13,7 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
   - Depth Strider moves to leggings.
   - New **Resilience** (chestplate, max III): reduces fire, explosion and projectile damage, burn time and knockback. It stacks with Protection. It replaces Fire, Blast and Projectile Protection, which are removed (config `resilience: false` swaps which is obtainable).
 - **No vanilla enchanted books** from loot chests, fishing, bartering, hero-of-the-village gifts or villager trades.
-- **Stronghold library shelves.** Stronghold libraries no longer have chests. Instead each newly generated library has 12–24 chiseled bookshelves holding up to six books in random slots, and each book has a 20% chance to be a tome.
+- **Stronghold library shelves.** Stronghold libraries no longer have chests. Instead each newly generated library has 12–24 chiseled bookshelves holding up to six books in random slots, and each book has a 20% chance to be a tome. Modded enchants can turn up there too, with no datapack needed.
 - **Flat XP curve.** Every level costs 50 XP, levels cap at 100, a Bottle o' Enchanting gives one level, and you drop 50% of your XP on death.
 - **Gear.**
   - Netherite gear is unbreakable.
@@ -28,11 +28,12 @@ An enchanting and progression overhaul for Fabric 1.21.1. Install it on both the
 
 ## Config
 
-`config/archive.json` is created on first launch. With [Mod Menu](https://modrinth.com/mod/modmenu) installed, everything can also be edited in game (Mods → Archive → Config), including per-item durability on the Durability tab. Archive requires [Cloth Config](https://modrinth.com/mod/cloth-config) for that screen.
+`config/archive.json` is created on first launch. On a server, the server's config is sent to each player when they join and applies for them until they leave, so durability, tool speeds, tooltips, the XP bar, mining and EMI all match the server. With [Mod Menu](https://modrinth.com/mod/modmenu) installed, everything can also be edited in game (Mods → Archive → Config), including per-item durability on the Durability tab. Archive requires [Cloth Config](https://modrinth.com/mod/cloth-config) for that screen.
 
 | Key | Default | |
 |---|---|---|
 | `xpCurve`, `durability`, `mining`, `anvil`, `grindstone`, `libraryTable`, `stripBookLoot` | `true` | Toggle each subsystem |
+| `shelfModdedEnchants` | `true` | Library shelf tomes also include modded enchants (obtainable, non-curse) that no shelf `loot_tomes` file lists, at weight 1 each beside the file's weights |
 | `resilience` | `true` | Resilience is obtainable and Fire, Blast and Projectile Protection aren't. `false` swaps them: Resilience joins the unobtainable enchants and the three come back in tomes, loot and the table. Existing items keep their enchants either way. Read when a world loads |
 | `strongholdShelves` | `true` | Stronghold libraries get chiseled bookshelves with books and tomes instead of chests (only affects newly generated chunks) |
 | `xpPerLevel` / `levelCap` / `deathXpFraction` | `50` / `100` / `0.5` | XP curve |
@@ -73,7 +74,7 @@ An optional `conditions` list takes vanilla loot conditions, which must all pass
     "tomes": { "minecraft:swift_sneak": 1 } } } }
 ```
 
-Stronghold library shelf tomes come from the loot table `archive:shelves/stronghold_library`, which is empty except for its `loot_tomes` file (`data/archive/loot_tomes/shelves/stronghold_library.json`, the same tomes as the library chest), so packs can add or change them the same way.
+Stronghold library shelf tomes come from the loot table `archive:shelves/stronghold_library` (plus modded enchants, see `shelfModdedEnchants`), which is empty except for its `loot_tomes` file (`data/archive/loot_tomes/shelves/stronghold_library.json`, the same tomes as the library chest), so packs can add or change them the same way.
 
 The `archive:set_tome` loot function (`{"function": "archive:set_tome", "enchantment": "minecraft:sharpness"}`) can also be used in your own loot tables. It refuses unobtainable enchants.
 

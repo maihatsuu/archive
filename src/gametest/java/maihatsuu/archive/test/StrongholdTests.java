@@ -55,6 +55,15 @@ public class StrongholdTests implements FabricGameTest {
 		helper.succeed();
 	}
 
+	/** Modded enchants (here the test datapack's) join the shelf roll; vanilla and Archive ones come only from the table. */
+	@GameTest(template = EMPTY_STRUCTURE)
+	public void moddedShelfTomes(GameTestHelper helper) {
+		List<String> ids = LibraryShelves.moddedTomes(helper.getLevel()).stream().map(e -> e.unwrapKey().orElseThrow().location().toString()).toList();
+		helper.assertTrue(ids.contains("archive_test:shelf_test"), "modded enchant should be a shelf tome: " + ids);
+		helper.assertTrue(ids.stream().noneMatch(id -> id.startsWith("minecraft:") || id.startsWith("archive:")), "only modded enchants: " + ids);
+		helper.succeed();
+	}
+
 	/** The shelf tome table (empty apart from its loot_tomes pool) always gives one tome. */
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void libraryShelfTable(GameTestHelper helper) {

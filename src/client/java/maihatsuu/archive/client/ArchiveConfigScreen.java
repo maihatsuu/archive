@@ -11,6 +11,7 @@ import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -32,7 +33,7 @@ public final class ArchiveConfigScreen {
 	}
 
 	public static Screen create(Screen parent) {
-		ArchiveConfig config = ArchiveConfig.get();
+		ArchiveConfig config = ArchiveConfig.local();
 		ArchiveConfig defaults = new ArchiveConfig();
 
 		ConfigBuilder builder = ConfigBuilder.create()
@@ -42,6 +43,9 @@ public final class ArchiveConfigScreen {
 		ConfigEntryBuilder entries = builder.entryBuilder();
 
 		ConfigCategory general = builder.getOrCreateCategory(Component.translatable("config.archive.category.general"));
+		if (ArchiveConfig.get() != config) {
+			general.addEntry(entries.startTextDescription(Component.translatable("config.archive.serverNote").withStyle(ChatFormatting.YELLOW)).build());
+		}
 		general.addEntry(entries.startBooleanToggle(name("xpCurve"), config.xpCurve)
 				.setDefaultValue(defaults.xpCurve).setTooltip(tooltip("xpCurve"))
 				.setSaveConsumer(v -> config.xpCurve = v).build());
@@ -68,6 +72,9 @@ public final class ArchiveConfigScreen {
 		general.addEntry(entries.startBooleanToggle(name("strongholdShelves"), config.strongholdShelves)
 				.setDefaultValue(defaults.strongholdShelves).setTooltip(tooltip("strongholdShelves"))
 				.setSaveConsumer(v -> config.strongholdShelves = v).build());
+		general.addEntry(entries.startBooleanToggle(name("shelfModdedEnchants"), config.shelfModdedEnchants)
+				.setDefaultValue(defaults.shelfModdedEnchants).setTooltip(tooltip("shelfModdedEnchants"))
+				.setSaveConsumer(v -> config.shelfModdedEnchants = v).build());
 		general.addEntry(entries.startBooleanToggle(name("resilience"), config.resilience)
 				.setDefaultValue(defaults.resilience).setTooltip(tooltip("resilience"))
 				.setSaveConsumer(v -> config.resilience = v).build());

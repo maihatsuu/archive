@@ -1,19 +1,30 @@
 package maihatsuu.archive;
 
+import maihatsuu.archive.mixin.gear.ItemComponentsAccessor;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.component.Unbreakable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Default item components: Archive's durability values, then the config's {@code durabilityOverrides} on top.
  * A durability of 0 or less makes the item unbreakable instead (netherite gear by default).
+ * <p>
+ * Applied at startup. A client joining a remote server calls {@link #rebuild} with the server's config (and again
+ * with its own on leaving), which redoes durability and the tool speeds that {@code TiersMixin} gives each tier.
+ * Stacks created afterwards, including everything the server sends, use the new defaults.
  */
 public final class GearComponents {
 	/** Archive's durability table (from the "Durability Values" spreadsheet), by item id, in display order. 0 = unbreakable. */
@@ -88,6 +99,12 @@ public final class GearComponents {
 			Map.entry("minecraft:warped_fungus_on_a_stick", 256)
 	);
 
+	/** Every damageable item's own durability components, before Archive touched them. */
+	private record Original(int maxDamage, @Nullable Unbreakable unbreakable) {
+	}
+
+	private static final Map<Item, Original> ORIGINAL = new IdentityHashMap<>();
+
 	@SafeVarargs
 	private static Map<String, Integer> ordered(Map.Entry<String, Integer>... entries) {
 		Map<String, Integer> map = new LinkedHashMap<>();
@@ -99,30 +116,78 @@ public final class GearComponents {
 
 	static void register() {
 		DefaultItemComponentEvents.MODIFY.register(context -> {
+			for (Item item : BuiltInRegistries.ITEM) {
+				DataComponentMap components = item.components();
+				if (components.has(DataComponents.MAX_DAMAGE)) {
+					ORIGINAL.put(item, new Original(components.getOrDefault(DataComponents.MAX_DAMAGE, 0), components.get(DataComponents.UNBREAKABLE)));
+				}
+			}
 			ArchiveConfig config = ArchiveConfig.get();
 			if (!config.durability) {
 				return;
 			}
-			Map<String, Integer> durability = new LinkedHashMap<>(DEFAULT_DURABILITY);
-			durability.putAll(config.durabilityOverrides);
-			for (Map.Entry<String, Integer> entry : durability.entrySet()) {
-				ResourceLocation id = ResourceLocation.tryParse(entry.getKey());
-				Item item = id == null ? null : BuiltInRegistries.ITEM.getOptional(id).orElse(null);
-				if (item == null || !item.components().has(DataComponents.MAX_DAMAGE)) {
-					Archive.LOGGER.warn("durabilityOverrides: '{}' is not a damageable item, skipping", entry.getKey());
-					continue;
+			for (String id : durabilityTable(config).keySet()) {
+				if (item(id) == null) {
+					Archive.LOGGER.warn("durabilityOverrides: '{}' is not a damageable item, skipping", id);
 				}
-				int value = entry.getValue();
-				// Unbreakable items keep their vanilla max damage; the component just stops it being used.
-				context.modify(item, builder -> {
-					if (value <= 0) {
-						builder.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-					} else {
-						builder.set(DataComponents.MAX_DAMAGE, value);
-					}
-				});
 			}
+			context.modify(ORIGINAL::containsKey, (builder, item) -> applyDurability(builder, item, config));
 		});
+	}
+
+	/** Redoes durability and tier tool speeds for {@code config}. Client only, when the config in effect changes. */
+	public static void rebuild(ArchiveConfig config) {
+		for (Item item : BuiltInRegistries.ITEM) {
+			boolean damageable = ORIGINAL.containsKey(item);
+			if (!damageable && !(item instanceof DiggerItem)) {
+				continue;
+			}
+			DataComponentMap.Builder builder = DataComponentMap.builder().addAll(item.components());
+			if (damageable) {
+				applyDurability(builder, item, config);
+			}
+			if (item instanceof DiggerItem digger && item.components().get(DataComponents.TOOL) instanceof Tool tool) {
+				// TiersMixin already answers with the config in effect; vanilla built the rule from the same call.
+				float speed = digger.getTier().getSpeed();
+				builder.set(DataComponents.TOOL, new Tool(tool.rules().stream()
+						.map(rule -> rule.speed().isPresent() && rule.correctForDrops().orElse(false)
+								? new Tool.Rule(rule.blocks(), Optional.of(speed), rule.correctForDrops()) : rule)
+						.toList(), tool.defaultMiningSpeed(), tool.damagePerBlock()));
+			}
+			((ItemComponentsAccessor) item).archive$setComponents(builder.build());
+		}
+	}
+
+	/** Sets an item's durability components: its own when not in the table (or durability is off), else the table's. */
+	private static void applyDurability(DataComponentMap.Builder builder, Item item, ArchiveConfig config) {
+		Original original = ORIGINAL.get(item);
+		builder.set(DataComponents.MAX_DAMAGE, original.maxDamage());
+		builder.set(DataComponents.UNBREAKABLE, original.unbreakable());
+		if (!config.durability) {
+			return;
+		}
+		Integer value = durabilityTable(config).get(BuiltInRegistries.ITEM.getKey(item).toString());
+		if (value == null) {
+			return;
+		}
+		// Unbreakable items keep their own max damage; the component just stops it being used.
+		if (value <= 0) {
+			builder.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
+		} else {
+			builder.set(DataComponents.MAX_DAMAGE, value);
+		}
+	}
+
+	private static Map<String, Integer> durabilityTable(ArchiveConfig config) {
+		Map<String, Integer> durability = new LinkedHashMap<>(DEFAULT_DURABILITY);
+		durability.putAll(config.durabilityOverrides);
+		return durability;
+	}
+
+	private static @Nullable Item item(String id) {
+		ResourceLocation location = ResourceLocation.tryParse(id);
+		Item item = location == null ? null : BuiltInRegistries.ITEM.getOptional(location).orElse(null);
+		return item != null && ORIGINAL.containsKey(item) ? item : null;
 	}
 
 	private GearComponents() {

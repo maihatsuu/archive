@@ -24,6 +24,7 @@ public class Archive implements ModInitializer {
 	public void onInitialize() {
 		ArchiveConfig.get();
 		ConfigCondition.register();
+		ConfigSyncPayload.register();
 		ModComponents.init();
 		ModItems.init();
 		ModLootFunctions.init();

@@ -13,7 +13,8 @@
 			"maihatsuu.archive.test.TomeTests",
 			"maihatsuu.archive.test.BookSourceTests",
 			"maihatsuu.archive.test.LibraryTableTests",
-			"maihatsuu.archive.test.StrongholdTests"
+			"maihatsuu.archive.test.StrongholdTests",
+			"maihatsuu.archive.test.ConfigSyncTests"
 		]
 	},
 	"depends": {
